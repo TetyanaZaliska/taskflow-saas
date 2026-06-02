@@ -1,8 +1,8 @@
 "use server";
 
-import { FormError } from "@/app/common/form-error.interface";
-import { API_URL } from "@/app/constants/api";
-import { getErrorMessage } from "@/app/util/errors";
+import { FormError } from "@/app/common/interfaces/form-error.interface";
+import { API_URL } from "@/app/common/constants/api";
+import { getErrorMessage } from "@/app/common/util/errors";
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -18,7 +18,7 @@ export default async function login(_prevState: FormError, formData: FormData) {
     return { error: getErrorMessage(parseRes) };
   }
   await setAuthCookie(res);
-  redirect("/");
+  redirect("/dashboard");
 }
 
 const setAuthCookie = async (response: Response) => {
