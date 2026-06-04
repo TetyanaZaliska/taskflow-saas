@@ -1,52 +1,30 @@
-export const unauthenticatedRoutes = [
-  {
-    title: "Login",
-    path: "/login",
+export const routes = {
+  public: {
+    home: "/",
+    about: "/about",
+    blog: "/blog",
+    contacts: "/contacts",
   },
-  {
-    title: "Signup",
-    path: "/signup",
+  auth: {
+    login: "/login",
+    signup: "/signup",
+    forgotPassword: "/forgot-password",
   },
-  {
-    title: "About",
-    path: "/about",
+
+  app: {
+    dashboard: "/dashboard",
+    tasks: "/tasks",
+    projects: "/projects",
+    activity: "/activity",
+    team: "/team",
+    settings: "/settings",
+
+    // User
+    profile: "/profile",
   },
-  {
-    title: "Blog",
-    path: "/blog",
+
+  // Auth actions
+  api: {
+    logout: "/logout",
   },
-  {
-    title: "Contacts",
-    path: "/contacts",
-  },
-  {
-    title: "Home",
-    path: "/home",
-  },
-];
-export const protectedRoutes = [
-  {
-    title: "Dashboard",
-    path: "/dashboard",
-  },
-  {
-    title: "Activity",
-    path: "/ativity",
-  },
-  {
-    title: "Projects",
-    path: "/projects",
-  },
-  {
-    title: "Settings",
-    path: "/settings",
-  },
-  {
-    title: "Tasks",
-    path: "/tasks",
-  },
-  {
-    title: "Team",
-    path: "/team",
-  },
-];
+} as const;

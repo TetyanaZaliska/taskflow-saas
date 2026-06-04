@@ -16,10 +16,9 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import Link from "next/link";
 import { useContext } from "react";
 import { AuthContext } from "@/app/(auth)/auth-context";
+import { authMenu, settingsMenu } from "@/app/common/constants/menus";
 
 export default function Header() {
-  const isAuthenticated = useContext(AuthContext);
-
   return (
     <header className="border-b bg-background">
       <div className="flex h-14 items-center gap-4 px-6">
@@ -32,7 +31,6 @@ export default function Header() {
         </div>
 
         <ThemeToggle></ThemeToggle>
-        {isAuthenticated ? <Settings /> : ""}
         <Settings />
       </div>
     </header>
@@ -40,6 +38,9 @@ export default function Header() {
 }
 
 const Settings = () => {
+  const isAuthenticated = useContext(AuthContext);
+  const settings = isAuthenticated ? settingsMenu : authMenu;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,24 +52,26 @@ const Settings = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32">
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/dashboard">Dashboard</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/tasks">Tasks</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/settings">Settings</Link>
-          </DropdownMenuItem>
+          {settings.map((setting) => (
+            <DropdownMenuItem key={setting.title} asChild>
+              <Link href={setting.path}>{setting.title}</Link>
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild variant="destructive">
-            <Link href="#" key="Logout">
-              Logout
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        {isAuthenticated ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild variant="destructive">
+                <Link href="#" key="Logout">
+                  Logout
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        ) : (
+          ""
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
