@@ -23,7 +23,7 @@ export const routes = {
     profile: "/profile",
   },
 
-  // Auth actions
+  // actions
   api: {
     logout: "/logout",
   },
