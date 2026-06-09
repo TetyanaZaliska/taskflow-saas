@@ -18,7 +18,11 @@ import { useContext } from "react";
 import { AuthContext } from "@/app/(auth)/auth-context";
 import { authMenu, settingsMenu } from "@/app/common/constants/menus";
 
-export default function Header() {
+interface HeaderProps {
+  logout: () => Promise<void>;
+}
+
+export default function Header({ logout }: HeaderProps) {
   return (
     <header className="border-b bg-background">
       <div className="flex h-14 items-center gap-4 px-6">
@@ -31,13 +35,13 @@ export default function Header() {
         </div>
 
         <ThemeToggle></ThemeToggle>
-        <Settings />
+        <Settings logout={logout} />
       </div>
     </header>
   );
 }
 
-const Settings = () => {
+const Settings = ({ logout }: HeaderProps) => {
   const isAuthenticated = useContext(AuthContext);
   const settings = isAuthenticated ? settingsMenu : authMenu;
 
@@ -63,7 +67,13 @@ const Settings = () => {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild variant="destructive">
-                <Link href="#" key="Logout">
+                <Link
+                  href="#"
+                  key="Logout"
+                  onClick={async () => {
+                    await logout();
+                  }}
+                >
                   Logout
                 </Link>
               </DropdownMenuItem>

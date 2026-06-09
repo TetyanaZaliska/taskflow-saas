@@ -1,15 +1,17 @@
 import { NextRequest } from "next/server";
+import authenticated from "./app/(auth)/authenticated";
+import { routes } from "./app/common/constants/routes";
 
-const unauthorizedRoutes = ["/login", "/signup"];
+//const unauthorizedRoutes = ["/login", "/signup"];
+const unauthorizedRoutes: string[] = [
+  ...Object.values(routes.auth),
+  ...Object.values(routes.public),
+];
 
-export function proxy(request: NextRequest) {
-  const auth = request.cookies.get("Authentication")?.value;
-
+export async function proxy(request: NextRequest) {
   if (
-    !auth &&
-    !unauthorizedRoutes.some((route) =>
-      request.nextUrl.pathname.startsWith(route),
-    )
+    !(await authenticated()) &&
+    !unauthorizedRoutes.includes(request.nextUrl.pathname)
   ) {
     return Response.redirect(new URL("/login", request.url));
   }

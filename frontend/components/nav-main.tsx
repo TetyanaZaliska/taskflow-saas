@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -16,6 +15,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { ChevronRightIcon } from "lucide-react";
+import Link from "next/link";
 
 export function NavMain({
   items,
@@ -51,9 +51,11 @@ export function NavMain({
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
               ) : (
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon}
-                  <span>{item.title}</span>
+                <SidebarMenuButton asChild tooltip={item.title}>
+                  <Link href={item.url}>
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </Link>
                 </SidebarMenuButton>
               )}
 

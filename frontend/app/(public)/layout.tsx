@@ -1,4 +1,5 @@
 import Header from "@/components/public/header";
+import logout from "../(auth)/logout";
 
 export default function PublicLayout({
   children,
@@ -7,7 +8,7 @@ export default function PublicLayout({
 }>) {
   return (
     <>
-      <Header />
+      <Header logout={logout} />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
     </>

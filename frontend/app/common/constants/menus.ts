@@ -1,3 +1,11 @@
+import {
+  Activity,
+  Box,
+  ClipboardList,
+  Settings,
+  SquareTerminal,
+  Users,
+} from "lucide-react";
 import { routes } from "./routes";
 
 export const topMenu = [
@@ -13,12 +21,12 @@ export const authMenu = [
 ];
 
 export const dashboardMenu = [
-  { title: "Dashboard", path: routes.app.dashboard },
-  { title: "Activity", path: routes.app.activity },
-  { title: "Projects", path: routes.app.projects },
-  { title: "Settings", path: routes.app.settings },
-  { title: "Tasks", path: routes.app.tasks },
-  { title: "Team", path: routes.app.team },
+  { title: "Dashboard", path: routes.app.dashboard, icon: SquareTerminal },
+  { title: "Activity", path: routes.app.activity, icon: Activity },
+  { title: "Projects", path: routes.app.projects, icon: Box },
+  { title: "Settings", path: routes.app.settings, icon: Settings },
+  { title: "Tasks", path: routes.app.tasks, icon: ClipboardList },
+  { title: "Team", path: routes.app.team, icon: Users },
 ];
 
 export const settingsMenu = [
