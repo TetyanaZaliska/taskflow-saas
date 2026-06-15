@@ -7,9 +7,14 @@ const getHeaders = async () => ({
 });
 
 export const post = async (path: string, formData: FormData) => {
+  const cookieStore = await cookies();
+
   const res = await fetch(`${API_URL}/${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookieStore.toString(),
+    },
     body: JSON.stringify(Object.fromEntries(formData)),
   });
   const parseRes = await res.json();
