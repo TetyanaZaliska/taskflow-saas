@@ -15,8 +15,8 @@ export const routes = {
     dashboard: "/dashboard",
     tasks: "/tasks",
     projects: "/projects",
-    activity: "/activity",
-    team: "/team",
+    activities: "/activities",
+    teams: "/teams",
     settings: "/settings",
 
     // User

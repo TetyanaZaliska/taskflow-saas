@@ -22,11 +22,11 @@ export const authMenu = [
 
 export const dashboardMenu = [
   { title: "Dashboard", path: routes.app.dashboard, icon: SquareTerminal },
-  { title: "Activity", path: routes.app.activity, icon: Activity },
+  { title: "Activities", path: routes.app.activities, icon: Activity },
   { title: "Projects", path: routes.app.projects, icon: Box },
   { title: "Settings", path: routes.app.settings, icon: Settings },
   { title: "Tasks", path: routes.app.tasks, icon: ClipboardList },
-  { title: "Team", path: routes.app.team, icon: Users },
+  { title: "Teams", path: routes.app.teams, icon: Users },
 ];
 
 export const settingsMenu = [

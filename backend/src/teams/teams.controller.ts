@@ -1,13 +1,13 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateTeamRequest } from './dto/create-team.request';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
-import { TeamService } from './team.service';
+import { TeamsService } from './teams.service';
 
-@Controller('team')
-export class TeamController {
-  constructor(private readonly teamService: TeamService) {}
+@Controller('teams')
+export class TeamsController {
+  constructor(private readonly teamsService: TeamsService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -15,6 +15,12 @@ export class TeamController {
     @Body() body: CreateTeamRequest,
     @CurrentUser() user: TokenPayload,
   ) {
-    return this.teamService.createTeam(body, user.userId);
+    return this.teamsService.createTeam(body, user.userId);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getTeams() {
+    return this.teamsService.getTeams();
   }
 }

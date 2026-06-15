@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { TeamRole } from '@prisma/client';
 
 @Injectable()
-export class TeamService {
+export class TeamsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createTeam(data: CreateTeamRequest, userId: number) {
@@ -19,5 +19,9 @@ export class TeamService {
         },
       },
     });
+  }
+
+  async getTeams() {
+    return await this.prismaService.team.findMany();
   }
 }
