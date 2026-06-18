@@ -1,3 +1,4 @@
+import Link from "next/link";
 import getTeam from "./get-team";
 import { Button } from "@/components/ui/button";
 
@@ -17,8 +18,8 @@ export default async function SingleTeam({ params }: SingleTeamProps) {
         {team.createdAt}
       </h4>
       <p>Some details will be soon</p>
-      <Button variant="outline" className="w-full">
-        Members
+      <Button variant="outline" className="w-full" asChild>
+        <Link href={`/teams/${team.id}/members`}>Members</Link>
       </Button>
     </>
   );

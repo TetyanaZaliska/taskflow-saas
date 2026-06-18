@@ -39,6 +39,8 @@ model TeamMember {
   role   TeamRole @default(MEMBER)
 
   createdAt DateTime @default(now())
+
+  @@unique([userId, teamId])
 }
 
 enum TeamRole {

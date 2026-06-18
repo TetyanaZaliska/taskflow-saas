@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateTeamRequest } from './dto/create-team.request';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -26,7 +34,7 @@ export class TeamsController {
 
   @Get(':teamId')
   @UseGuards(JwtAuthGuard)
-  async getTeam(@Param('teamId') teamId: string) {
-    return this.teamsService.getTeam(+teamId);
+  async getTeam(@Param('teamId', ParseIntPipe) teamId: number) {
+    return this.teamsService.getTeam(teamId);
   }
 }
