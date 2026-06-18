@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTeamRequest } from './dto/create-team.request';
 import { PrismaService } from '../prisma/prisma.service';
 import { TeamRole } from '@prisma/client';
@@ -22,6 +22,16 @@ export class TeamsService {
   }
 
   async getTeams() {
-    return await this.prismaService.team.findMany();
+    return this.prismaService.team.findMany();
+  }
+
+  async getTeam(teamId: number) {
+    try {
+      return await this.prismaService.team.findUniqueOrThrow({
+        where: { id: teamId },
+      });
+    } catch (err) {
+      throw new NotFoundException(`Team not found with id ${teamId}`);
+    }
   }
 }

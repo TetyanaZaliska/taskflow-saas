@@ -1,13 +1,13 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import getTeams from "../actions/get-teams";
+import TeamRow from "./team-row";
 
 export default async function TeamsTable() {
   const teams = await getTeams();
@@ -16,18 +16,16 @@ export default async function TeamsTable() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">ID</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead className="text-right">Created</TableHead>
+          <TableHead className="w-[100px] text-muted-foreground">ID</TableHead>
+          <TableHead className="text-muted-foreground">Name</TableHead>
+          <TableHead className="text-right text-muted-foreground">
+            Created
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {teams.map((team) => (
-          <TableRow key={team.id}>
-            <TableCell className="font-medium">{team.id}</TableCell>
-            <TableCell>{team.name}</TableCell>
-            <TableCell className="text-right">{team.createdAt}</TableCell>
-          </TableRow>
+          <TeamRow key={team.id} team={team} />
         ))}
       </TableBody>
     </Table>

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateTeamRequest } from './dto/create-team.request';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -22,5 +22,11 @@ export class TeamsController {
   @UseGuards(JwtAuthGuard)
   async getTeams() {
     return this.teamsService.getTeams();
+  }
+
+  @Get(':teamId')
+  @UseGuards(JwtAuthGuard)
+  async getTeam(@Param('teamId') teamId: string) {
+    return this.teamsService.getTeam(+teamId);
   }
 }
