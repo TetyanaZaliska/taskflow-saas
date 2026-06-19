@@ -29,7 +29,10 @@ export class TeamMembersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getMembers(@Param('teamId', ParseIntPipe) teamId: number) {
-    return this.teamMemberService.getMembers(teamId);
+  async getMembers(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.teamMemberService.getMembers(teamId, user.userId);
   }
 }

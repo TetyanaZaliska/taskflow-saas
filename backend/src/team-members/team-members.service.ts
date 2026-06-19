@@ -27,7 +27,9 @@ export class TeamMembersService {
     });
   }
 
-  async getMembers(teamId: number) {
+  async getMembers(teamId: number, currentUserId: number) {
+    await this.assertTeamMember(teamId, currentUserId);
+
     return this.prismaService.teamMember.findMany({
       where: {
         teamId,
@@ -46,30 +48,25 @@ export class TeamMembersService {
   }
 
   private async assertAdmin(teamId: number, userId: number) {
-    const member = await this.prismaService.teamMember.findFirst({
-      where: {
-        teamId,
-        userId,
-        role: TeamRole.ADMIN,
-      },
-    });
+    const member = await this.getTeamMember(teamId, userId);
+
+    if (!member || member.role !== TeamRole.ADMIN) {
+      throw new ForbiddenException('You are not an admin of this team');
+    }
+  }
+
+  private async assertTeamMember(teamId: number, userId: number) {
+    const member = await this.getTeamMember(teamId, userId);
 
     if (!member) {
-      throw new ForbiddenException('Only team admins can add members');
+      throw new ForbiddenException('You are not a member of this team');
     }
   }
 
   private async assertUniqueTeamMember(teamId: number, userId: number) {
-    const existingMember = await this.prismaService.teamMember.findUnique({
-      where: {
-        userId_teamId: {
-          teamId,
-          userId,
-        },
-      },
-    });
+    const member = await this.getTeamMember(teamId, userId);
 
-    if (existingMember) {
+    if (member) {
       throw new ConflictException('User is already a team member');
     }
   }
@@ -96,5 +93,16 @@ export class TeamMembersService {
     if (!team) {
       throw new NotFoundException('Team not found');
     }
+  }
+
+  private async getTeamMember(teamId: number, userId: number) {
+    return this.prismaService.teamMember.findUnique({
+      where: {
+        userId_teamId: {
+          teamId,
+          userId,
+        },
+      },
+    });
   }
 }

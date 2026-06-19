@@ -1,5 +1,6 @@
 import getTeam from "../get-team";
 import { AddMemberModal } from "./add-member/add-member-modal";
+import MembersTable from "./show-members/members-table";
 
 interface MembersProps {
   params: Promise<{ teamId: string }>;
@@ -15,6 +16,7 @@ export default async function Members({ params }: MembersProps) {
         {team.name}
       </h2>
       <AddMemberModal teamId={teamId} />
+      <MembersTable teamId={teamId} />
     </>
   );
 }

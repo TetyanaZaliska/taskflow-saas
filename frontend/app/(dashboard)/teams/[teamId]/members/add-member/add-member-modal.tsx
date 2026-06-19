@@ -16,9 +16,21 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, UserPlus } from "lucide-react";
 import { useState } from "react";
 import addMember from "../actions/add-member";
+import {
+  Combobox,
+  ComboboxCollection,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxLabel,
+  ComboboxList,
+} from "@/components/ui/combobox";
+import { InputGroupAddon } from "@/components/ui/input-group";
 
 interface AddMemberModalProps {
   teamId: number;
@@ -32,6 +44,15 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
     setResponse(undefined);
     setModalVisible(false);
   };
+
+  const users = [
+    "User 1...",
+    "(GMT-8) Los Angeles",
+    "(GMT-6) Chicago",
+    "(GMT-5) Toronto",
+    "(GMT-8) Vancouver",
+    "(GMT-3) São Paulo",
+  ] as const;
 
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
@@ -55,7 +76,24 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
             <DialogDescription>Choose a new member</DialogDescription>
           </DialogHeader>
           <FieldGroup>
-            <input type="hidden" name="teamId" value={teamId} />
+            <Combobox items={users}>
+              <ComboboxInput placeholder="Select a user">
+                <InputGroupAddon>
+                  <UserPlus />
+                </InputGroupAddon>
+              </ComboboxInput>
+              <ComboboxContent alignOffset={-28} className="w-60">
+                <ComboboxEmpty>No users found.</ComboboxEmpty>
+                <ComboboxList>
+                  {(user) => (
+                    <ComboboxItem key={user} value={user}>
+                      {user}
+                    </ComboboxItem>
+                  )}
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+
             <Field>
               <Label htmlFor="name">Name</Label>
               <Input
