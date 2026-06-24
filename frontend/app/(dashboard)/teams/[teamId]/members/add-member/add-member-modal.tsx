@@ -14,23 +14,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field, FieldGroup } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { CirclePlus, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import addMember from "../actions/add-member";
 import {
   Combobox,
-  ComboboxCollection,
   ComboboxContent,
   ComboboxEmpty,
-  ComboboxGroup,
   ComboboxInput,
   ComboboxItem,
-  ComboboxLabel,
   ComboboxList,
 } from "@/components/ui/combobox";
 import { InputGroupAddon } from "@/components/ui/input-group";
+import { ChooseRole } from "./choose-role";
+import { User } from "../interfaces/user.interface";
+import { searchUsers } from "../actions/search-users";
 
 interface AddMemberModalProps {
   teamId: number;
@@ -39,20 +37,39 @@ interface AddMemberModalProps {
 export function AddMemberModal({ teamId }: AddMemberModalProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [response, setResponse] = useState<FormResponse>();
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+
+  const addMemberAction = addMember.bind(null, teamId);
+
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      if (search.length < 2) {
+        setUsers([]);
+        return;
+      }
+
+      try {
+        const users = await searchUsers(search);
+
+        setUsers(users);
+      } catch (error) {
+        console.error(error);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
 
   const onClose = () => {
     setResponse(undefined);
+    setSelectedUser(null);
+    setSearch("");
+    setUsers([]);
     setModalVisible(false);
   };
-
-  const users = [
-    "User 1...",
-    "(GMT-8) Los Angeles",
-    "(GMT-6) Chicago",
-    "(GMT-5) Toronto",
-    "(GMT-8) Vancouver",
-    "(GMT-3) São Paulo",
-  ] as const;
 
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
@@ -64,7 +81,7 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
       <DialogContent className="sm:max-w-sm">
         <form
           action={async (formData) => {
-            const response = await addMember(formData);
+            const response = await addMemberAction(formData);
             setResponse(response);
             if (!response.error) {
               onClose();
@@ -75,35 +92,36 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
             <DialogTitle>Add a new team member</DialogTitle>
             <DialogDescription>Choose a new member</DialogDescription>
           </DialogHeader>
-          <FieldGroup>
-            <Combobox items={users}>
+          <FieldGroup className="mb-5">
+            <Combobox
+              items={users}
+              name="userId"
+              value={selectedUser}
+              onValueChange={setSelectedUser}
+              onInputValueChange={(value) => setSearch(value ?? "")}
+            >
               <ComboboxInput placeholder="Select a user">
                 <InputGroupAddon>
                   <UserPlus />
                 </InputGroupAddon>
               </ComboboxInput>
-              <ComboboxContent alignOffset={-28} className="w-60">
+              <ComboboxContent
+                alignOffset={-28}
+                className="w-60 pointer-events-auto"
+              >
                 <ComboboxEmpty>No users found.</ComboboxEmpty>
                 <ComboboxList>
                   {(user) => (
-                    <ComboboxItem key={user} value={user}>
-                      {user}
+                    <ComboboxItem key={user.id} value={user.id}>
+                      {user.email}
                     </ComboboxItem>
                   )}
                 </ComboboxList>
               </ComboboxContent>
             </Combobox>
 
-            <Field>
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Frontend Team"
-                required
-              />
-            </Field>
+            <ChooseRole />
+
             {!!response?.error && (
               <AlertBox message={response.error}></AlertBox>
             )}

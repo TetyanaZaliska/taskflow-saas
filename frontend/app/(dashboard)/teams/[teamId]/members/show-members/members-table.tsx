@@ -1,7 +1,6 @@
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -15,7 +14,6 @@ interface MembersTableProps {
 
 export default async function MembersTable({ teamId }: MembersTableProps) {
   const members = await getMembers(teamId);
-  console.log(members);
 
   return (
     <Table>

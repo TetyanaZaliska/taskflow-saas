@@ -35,4 +35,28 @@ export class UsersService {
       where: filter,
     });
   }
+
+  async searchUsers(query: string) {
+    if (!query?.trim()) {
+      return [];
+    }
+
+    return this.prismaService.user.findMany({
+      where: {
+        OR: [
+          {
+            email: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+      take: 10,
+    });
+  }
 }

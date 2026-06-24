@@ -29,5 +29,13 @@ export const get = async <T>(path: string, tags?: string[]) => {
     headers: { ...(await getHeaders()) },
     next: { tags },
   });
+
+  const parseRes = await res.json();
+  if (!res.ok) {
+    return { error: getErrorMessage(parseRes) };
+  }
+
+  return parseRes;
+
   return res.json() as T;
 };

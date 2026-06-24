@@ -28,7 +28,7 @@ export class TeamMembersService {
   }
 
   async getMembers(teamId: number, currentUserId: number) {
-    await this.assertTeamMember(teamId, currentUserId);
+    //await this.assertTeamMember(teamId, currentUserId);
 
     return this.prismaService.teamMember.findMany({
       where: {

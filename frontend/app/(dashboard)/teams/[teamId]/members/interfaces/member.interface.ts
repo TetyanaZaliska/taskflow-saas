@@ -1,4 +1,6 @@
-export type TeamRole = "ADMIN" | "MEMBER";
+import { TEAM_ROLES } from "@/app/common/constants/team-roles";
+
+export type TeamRole = (typeof TEAM_ROLES)[keyof typeof TEAM_ROLES];
 
 export interface Member {
   id: number;
