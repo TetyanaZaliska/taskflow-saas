@@ -21,11 +21,19 @@ export class TeamsService {
     });
   }
 
-  async getTeams() {
-    return this.prismaService.team.findMany();
+  async getTeams(userId: number) {
+    return this.prismaService.team.findMany({
+      where: {
+        members: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    });
   }
 
-  async getTeam(teamId: number) {
+  async getTeam(teamId: number, userId: number) {
     try {
       return await this.prismaService.team.findUniqueOrThrow({
         where: { id: teamId },

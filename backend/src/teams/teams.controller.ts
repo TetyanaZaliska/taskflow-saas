@@ -12,6 +12,7 @@ import { CreateTeamRequest } from './dto/create-team.request';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
 import { TeamsService } from './teams.service';
+import { TeamRolesGuard } from '../guards/team-roles.guard';
 
 @Controller('teams')
 export class TeamsController {
@@ -28,13 +29,16 @@ export class TeamsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getTeams() {
-    return this.teamsService.getTeams();
+  async getTeams(@CurrentUser() user: TokenPayload) {
+    return this.teamsService.getTeams(user.userId);
   }
 
   @Get(':teamId')
-  @UseGuards(JwtAuthGuard)
-  async getTeam(@Param('teamId', ParseIntPipe) teamId: number) {
-    return this.teamsService.getTeam(teamId);
+  @UseGuards(JwtAuthGuard, TeamRolesGuard)
+  async getTeam(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.teamsService.getTeam(teamId, user.userId);
   }
 }
