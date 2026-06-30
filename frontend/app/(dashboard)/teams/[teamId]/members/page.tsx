@@ -1,6 +1,8 @@
+import { routes } from "@/app/common/constants/routes";
 import getTeam from "../get-team";
 import { AddMemberModal } from "./add-member/add-member-modal";
 import MembersTable from "./show-members/members-table";
+import { assertNoErrors } from "@/app/common/util/error-redirect";
 
 interface MembersProps {
   params: Promise<{ teamId: string }>;
@@ -9,6 +11,8 @@ interface MembersProps {
 export default async function Members({ params }: MembersProps) {
   const teamId = +(await params).teamId;
   const team = await getTeam(teamId);
+
+  assertNoErrors(team, routes.app.teams);
 
   return (
     <>

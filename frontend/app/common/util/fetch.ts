@@ -1,19 +1,20 @@
 import { cookies } from "next/headers";
 import { API_URL } from "../constants/api";
 import { getErrorMessage } from "./errors";
+import { getRouteName } from "./get-route-name";
 
 const getHeaders = async () => ({
   Cookie: (await cookies()).toString(),
 });
 
 export const post = async (path: string, formData: FormData) => {
-  const cookieStore = await cookies();
+  const pathName = getRouteName(path);
 
-  const res = await fetch(`${API_URL}/${path}`, {
+  const res = await fetch(`${API_URL}/${pathName}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Cookie: cookieStore.toString(),
+      ...(await getHeaders()),
     },
     body: JSON.stringify(Object.fromEntries(formData)),
   });
@@ -25,7 +26,9 @@ export const post = async (path: string, formData: FormData) => {
 };
 
 export const get = async <T>(path: string, tags?: string[]) => {
-  const res = await fetch(`${API_URL}/${path}`, {
+  const pathName = getRouteName(path);
+
+  const res = await fetch(`${API_URL}/${pathName}`, {
     headers: { ...(await getHeaders()) },
     next: { tags },
   });
@@ -38,4 +41,22 @@ export const get = async <T>(path: string, tags?: string[]) => {
   return parseRes;
 
   return res.json() as T;
+};
+
+export const remove = async (path: string) => {
+  const pathName = getRouteName(path);
+
+  const res = await fetch(`${API_URL}/${pathName}`, {
+    method: "DELETE",
+    headers: { ...(await getHeaders()) },
+  });
+
+  //const parseRes = await res.json();
+  const textRes = await res.text();
+  const parseRes = textRes ? JSON.parse(textRes) : {};
+
+  if (!res.ok) {
+    return { error: getErrorMessage(parseRes) };
+  }
+  return { error: "" };
 };

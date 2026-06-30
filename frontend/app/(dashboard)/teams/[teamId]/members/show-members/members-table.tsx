@@ -23,6 +23,9 @@ export default async function MembersTable({ teamId }: MembersTableProps) {
           <TableHead className="text-right text-muted-foreground">
             Role
           </TableHead>
+          <TableHead className="text-right text-muted-foreground">
+            Actions
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

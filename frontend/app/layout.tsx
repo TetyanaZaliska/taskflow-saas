@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppProviders from "./app-providers";
 import authenticated from "./(auth)/authenticated";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AppProviders authenticated={isAuthenticated}>{children}</AppProviders>
+        <Toaster />
       </body>
     </html>
   );

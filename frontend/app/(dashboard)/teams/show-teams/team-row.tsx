@@ -4,6 +4,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Team } from "../interfaces/team.interface";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { routes } from "@/app/common/constants/routes";
 
 interface TeamRowProps {
   team: Team;
@@ -14,7 +15,7 @@ export default function TeamRow({ team }: TeamRowProps) {
 
   return (
     <TableRow
-      onClick={() => router.push(`/teams/${team.id}`)}
+      onClick={() => router.push(routes.app.team(team.id))}
       className={cn("cursor-pointer hover:bg-muted/50 transition-colors")}
     >
       <TableCell className="font-medium">{team.id}</TableCell>

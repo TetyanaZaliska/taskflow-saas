@@ -112,7 +112,7 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
                 <ComboboxEmpty>No users found.</ComboboxEmpty>
                 <ComboboxList>
                   {(user) => (
-                    <ComboboxItem key={user.id} value={user.id}>
+                    <ComboboxItem key={user.id} value={user.email}>
                       {user.email}
                     </ComboboxItem>
                   )}

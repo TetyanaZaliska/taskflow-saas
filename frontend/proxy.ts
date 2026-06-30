@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import authenticated from "./app/(auth)/authenticated";
 import { routes } from "./app/common/constants/routes";
 
-//const unauthorizedRoutes = ["/login", "/signup"];
 const unauthorizedRoutes: string[] = [
   ...Object.values(routes.auth),
   ...Object.values(routes.public),
@@ -13,7 +12,7 @@ export async function proxy(request: NextRequest) {
     !(await authenticated()) &&
     !unauthorizedRoutes.includes(request.nextUrl.pathname)
   ) {
-    return Response.redirect(new URL("/login", request.url));
+    return Response.redirect(new URL(routes.auth.login, request.url));
   }
 }
 

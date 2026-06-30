@@ -15,6 +15,7 @@ import {
 import { useActionState } from "react";
 import { AlertBox } from "@/components/custom/alert-box";
 import login from "./login";
+import { routes } from "@/app/common/constants/routes";
 
 export default function Login() {
   const [state, formAction] = useActionState(login, { error: "" });
@@ -43,7 +44,7 @@ export default function Login() {
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   <Link
-                    href="#"
+                    href={routes.auth.forgotPassword}
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
@@ -59,7 +60,7 @@ export default function Login() {
               Login
             </Button>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/signup">Signup</Link>
+              <Link href={routes.auth.signup}>Signup</Link>
             </Button>
           </CardFooter>
         </Card>

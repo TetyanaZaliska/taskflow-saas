@@ -1,6 +1,8 @@
 import Link from "next/link";
 import getTeam from "./get-team";
 import { Button } from "@/components/ui/button";
+import { routes } from "@/app/common/constants/routes";
+import { assertNoErrors } from "@/app/common/util/error-redirect";
 
 interface SingleTeamProps {
   params: Promise<{ teamId: string }>;
@@ -8,6 +10,8 @@ interface SingleTeamProps {
 
 export default async function SingleTeam({ params }: SingleTeamProps) {
   const team = await getTeam(+(await params).teamId);
+
+  assertNoErrors(team, routes.app.teams);
 
   return (
     <>
@@ -19,7 +23,7 @@ export default async function SingleTeam({ params }: SingleTeamProps) {
       </h4>
       <p>Some details will be soon</p>
       <Button variant="outline" className="w-full" asChild>
-        <Link href={`/teams/${team.id}/members`}>Members</Link>
+        <Link href={routes.app.teamMembers(team.id)}>Members</Link>
       </Button>
     </>
   );

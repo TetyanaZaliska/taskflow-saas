@@ -1,6 +1,5 @@
 import {
-  ConflictException,
-  ForbiddenException,
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,29 +12,33 @@ export class TeamMembersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async addMember(teamId: number, data: AddMemberRequest, userId: number) {
-    await this.assertTeamExist(teamId);
-    await this.assertAdmin(teamId, userId);
-    await this.assertUserExist(data.userId);
-    await this.assertUniqueTeamMember(teamId, data.userId);
+    try {
+      return this.prismaService.teamMember.create({
+        data: {
+          userId: data.userId,
+          teamId: teamId,
+          role: data.role ?? TeamRole.MEMBER,
+        },
+      });
+    } catch (error) {
+      if (error?.code === 'P2002') {
+        throw new BadRequestException(
+          'This user is already a member of the team.',
+        );
+      }
 
-    return this.prismaService.teamMember.create({
-      data: {
-        userId: data.userId,
-        teamId: teamId,
-        role: data.role ?? TeamRole.MEMBER,
-      },
-    });
+      throw error;
+    }
   }
 
   async getMembers(teamId: number, currentUserId: number) {
-    //await this.assertTeamMember(teamId, currentUserId);
-
     return this.prismaService.teamMember.findMany({
       where: {
         teamId,
       },
       select: {
         id: true,
+        teamId: true,
         role: true,
         user: {
           select: {
@@ -47,62 +50,35 @@ export class TeamMembersService {
     });
   }
 
-  private async assertAdmin(teamId: number, userId: number) {
-    const member = await this.getTeamMember(teamId, userId);
-
-    if (!member || member.role !== TeamRole.ADMIN) {
-      throw new ForbiddenException('You are not an admin of this team');
-    }
-  }
-
-  private async assertTeamMember(teamId: number, userId: number) {
-    const member = await this.getTeamMember(teamId, userId);
-
-    if (!member) {
-      throw new ForbiddenException('You are not a member of this team');
-    }
-  }
-
-  private async assertUniqueTeamMember(teamId: number, userId: number) {
-    const member = await this.getTeamMember(teamId, userId);
-
-    if (member) {
-      throw new ConflictException('User is already a team member');
-    }
-  }
-
-  private async assertUserExist(userId: number) {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-  }
-
-  private async assertTeamExist(teamId: number) {
-    const team = await this.prismaService.team.findUnique({
-      where: {
-        id: teamId,
-      },
-    });
-
-    if (!team) {
-      throw new NotFoundException('Team not found');
-    }
-  }
-
-  private async getTeamMember(teamId: number, userId: number) {
-    return this.prismaService.teamMember.findUnique({
-      where: {
-        userId_teamId: {
-          teamId,
-          userId,
+  async removeMember(teamId: number, memberId: number) {
+    return this.prismaService.$transaction(async (tx) => {
+      const memberToDelete = await tx.teamMember.findUnique({
+        where: {
+          userId_teamId: { teamId, userId: memberId },
         },
-      },
+      });
+
+      if (!memberToDelete) {
+        throw new NotFoundException('Member not found in this team.');
+      }
+
+      const deletedMember = await tx.teamMember.delete({
+        where: { id: memberToDelete.id },
+      });
+
+      if (memberToDelete.role === TeamRole.ADMIN) {
+        const remainingAdmins = await tx.teamMember.count({
+          where: { teamId, role: TeamRole.ADMIN },
+        });
+
+        if (remainingAdmins === 0) {
+          throw new BadRequestException(
+            'Impossible to delete the last admin! Promote another team member first.',
+          );
+        }
+      }
+
+      return deletedMember;
     });
   }
 }

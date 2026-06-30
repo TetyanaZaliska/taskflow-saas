@@ -1,6 +1,5 @@
 "use client";
 
-import createUser from "./create-user";
 import { useActionState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,15 +16,15 @@ import {
 } from "@/components/ui/card";
 import { routes } from "@/app/common/constants/routes";
 
-export default function Signup() {
-  const [state, formAction] = useActionState(createUser, { error: "" });
+export default function ForgotPassword() {
+  //const [state, formAction] = useActionState(, { error: "" });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
-      <form action={formAction} className="w-full max-w-sm shadow-xl">
+      <form action="{formAction}" className="w-full max-w-sm shadow-xl">
         <Card>
           <CardHeader>
-            <CardTitle>Create account</CardTitle>
+            <CardTitle>Forgot password?</CardTitle>
             <CardDescription>Fill in your details</CardDescription>
           </CardHeader>
           <CardContent>
@@ -40,24 +39,14 @@ export default function Signup() {
                   required
                 />
               </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input id="password" name="password" type="password" required />
-              </div>
-              {!!state.error && <AlertBox message={state.error}></AlertBox>}
+              {
+                //!!state.error && <AlertBox message={state.error}></AlertBox>
+              }
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
             <Button type="submit" className="w-full">
-              Signup
+              Submit
             </Button>
             <Button asChild variant="outline" className="w-full">
               <Link href={routes.auth.login}>Login</Link>

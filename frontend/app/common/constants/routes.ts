@@ -17,7 +17,11 @@ export const routes = {
     projects: "/projects",
     activities: "/activities",
     teams: "/teams",
+    team: (teamId: string | number) => `/teams/${teamId}` as const,
+    teamMembers: (teamId: string | number) =>
+      `/teams/${teamId}/members` as const,
     settings: "/settings",
+    users: "/users",
 
     // User
     profile: "/profile",

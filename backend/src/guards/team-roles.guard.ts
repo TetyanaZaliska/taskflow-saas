@@ -22,10 +22,6 @@ export class TeamRolesGuard implements CanActivate {
 
     const teamId = Number(request.params.teamId); // || request.headers['x-team-id'];
 
-    console.log('--- GUARD ACCESS DEBUG ---');
-    console.log('Raw teamId param from URL:', teamId);
-    console.log('Raw userId param from URL:', user.userId);
-
     if (!user || isNaN(teamId)) {
       throw new ForbiddenException('No team!');
     }
@@ -39,8 +35,6 @@ export class TeamRolesGuard implements CanActivate {
       },
     });
 
-    console.log('--- PASS membership ID ---');
-
     if (!membership) {
       throw new ForbiddenException('You are not a part of this team');
     }
@@ -51,7 +45,7 @@ export class TeamRolesGuard implements CanActivate {
     );
 
     if (!requiredRoles) {
-      console.log('No roles required, skipping check.');
+      //console.log('No roles required, skipping check.');
       return true;
     }
 

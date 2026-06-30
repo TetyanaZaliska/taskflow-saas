@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -39,5 +40,15 @@ export class TeamMembersController {
     @CurrentUser() user: TokenPayload,
   ) {
     return this.teamMemberService.getMembers(teamId, user.userId);
+  }
+
+  @Delete(':memberId')
+  @UseGuards(JwtAuthGuard, TeamRolesGuard)
+  @TeamRoles(TeamRole.ADMIN)
+  async removeMember(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('memberId', ParseIntPipe) memberId: number,
+  ) {
+    return this.teamMemberService.removeMember(teamId, memberId);
   }
 }
