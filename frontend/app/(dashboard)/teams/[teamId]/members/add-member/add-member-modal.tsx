@@ -95,7 +95,7 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
           <FieldGroup className="mb-5">
             <Combobox
               items={users}
-              name="userId"
+              name="email"
               value={selectedUser}
               onValueChange={setSelectedUser}
               onInputValueChange={(value) => setSearch(value ?? "")}

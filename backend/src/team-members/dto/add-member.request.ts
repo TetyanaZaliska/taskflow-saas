@@ -1,11 +1,9 @@
 import { TeamRole } from '@prisma/client';
-import { Type } from 'class-transformer';
-import { IsEnum, IsInt } from 'class-validator';
+import { IsEmail, IsEnum } from 'class-validator';
 
 export class AddMemberRequest {
-  @Type(() => Number)
-  @IsInt()
-  userId!: number;
+  @IsEmail()
+  email!: string;
 
   @IsEnum(TeamRole)
   role!: TeamRole;

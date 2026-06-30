@@ -11,11 +11,24 @@ import { TeamRole } from '@prisma/client';
 export class TeamMembersService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async addMember(teamId: number, data: AddMemberRequest, userId: number) {
+  async addMember(teamId: number, data: AddMemberRequest, curUserId: number) {
     try {
+      const user = await this.prismaService.user.findUnique({
+        where: {
+          email: data.email,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!user) {
+        throw new NotFoundException('User not found!');
+      }
+
       return this.prismaService.teamMember.create({
         data: {
-          userId: data.userId,
+          userId: user.id,
           teamId: teamId,
           role: data.role ?? TeamRole.MEMBER,
         },
