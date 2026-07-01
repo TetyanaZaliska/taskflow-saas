@@ -42,4 +42,22 @@ export class TeamsService {
       throw new NotFoundException(`Team not found with id ${teamId}`);
     }
   }
+
+  async removeTeam(teamId: number) {
+    return this.prismaService.$transaction(async (tx) => {
+      const teamToDelete = await tx.team.findUnique({
+        where: { id: teamId },
+      });
+
+      if (!teamToDelete) {
+        throw new NotFoundException('Team not found.');
+      }
+
+      const deletedTeam = await tx.team.delete({
+        where: { id: teamId },
+      });
+
+      return deletedTeam;
+    });
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -13,6 +14,8 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
 import { TeamsService } from './teams.service';
 import { TeamRolesGuard } from '../guards/team-roles.guard';
+import { TeamRoles } from './team-roles.decorator';
+import { TeamRole } from '@prisma/client';
 
 @Controller('teams')
 export class TeamsController {
@@ -40,5 +43,12 @@ export class TeamsController {
     @CurrentUser() user: TokenPayload,
   ) {
     return this.teamsService.getTeam(teamId, user.userId);
+  }
+
+  @Delete(':teamId')
+  @UseGuards(JwtAuthGuard, TeamRolesGuard)
+  @TeamRoles(TeamRole.ADMIN)
+  async removeTeam(@Param('teamId', ParseIntPipe) teamId: number) {
+    return this.teamsService.removeTeam(teamId);
   }
 }

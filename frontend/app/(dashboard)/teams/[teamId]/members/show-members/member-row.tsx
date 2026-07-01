@@ -7,7 +7,7 @@ import { Member, MemberWithUser } from "../interfaces/member.interface";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/app/common/constants/routes";
-import deleteMember from "../actions/delete-member";
+import removeMember from "../actions/remove-member";
 import { toast } from "sonner";
 
 interface MemberRowProps {
@@ -20,8 +20,8 @@ export default function MemberRow({ member }: MemberRowProps) {
   const handleRouteUser = () =>
     router.push(`${routes.app.teamMembers(member.teamId)}/${member.user.id}`);
 
-  const handleDelete = async () => {
-    const res = await deleteMember(member.teamId, member.user.id);
+  const handleRemove = async () => {
+    const res = await removeMember(member.teamId, member.user.id);
 
     if (res?.error) {
       toast.error(res.error, { position: "top-right" });
@@ -41,7 +41,7 @@ export default function MemberRow({ member }: MemberRowProps) {
         {member.role}
       </TableCell>
       <TableCell className="text-right">
-        <Button onClick={handleDelete} variant="destructive" className="w-min">
+        <Button onClick={handleRemove} variant="destructive" className="w-min">
           <Trash2 className="h-4 w-4" />
         </Button>
       </TableCell>

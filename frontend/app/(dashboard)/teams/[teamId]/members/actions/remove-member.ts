@@ -6,7 +6,7 @@ import { remove } from "@/app/common/util/fetch";
 import { getRouteName } from "@/app/common/util/get-route-name";
 import { revalidatePath } from "next/cache";
 
-export default async function deleteMember(teamId: number, memberId: number) {
+export default async function removeMember(teamId: number, memberId: number) {
   let response;
   try {
     response = await remove(
