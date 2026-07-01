@@ -26,6 +26,9 @@ export default async function SingleTeam({ params }: SingleTeamProps) {
       <Button variant="outline" className="w-full" asChild>
         <Link href={routes.app.teamMembers(team.id)}>Members</Link>
       </Button>
+      <Button variant="outline" className="w-full" asChild>
+        <Link href={routes.app.teamProjects(team.id)}>Projects</Link>
+      </Button>
     </>
   );
 }

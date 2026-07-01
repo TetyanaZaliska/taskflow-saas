@@ -23,6 +23,7 @@ model Team {
   name      String
 
   members   TeamMember[]
+  projects  Project[]
 
   createdAt DateTime @default(now())
 }
@@ -46,4 +47,16 @@ model TeamMember {
 enum TeamRole {
   ADMIN
   MEMBER
+}
+
+model Project {
+  id          Int @id @default(autoincrement())
+  name        String
+  description String?
+
+  teamId      Int
+  team        Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

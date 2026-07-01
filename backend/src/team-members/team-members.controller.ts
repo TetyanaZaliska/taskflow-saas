@@ -6,7 +6,6 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  SetMetadata,
   UseGuards,
 } from '@nestjs/common';
 import { TeamMembersService } from './team-members.service';

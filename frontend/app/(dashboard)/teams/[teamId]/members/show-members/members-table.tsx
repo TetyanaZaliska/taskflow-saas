@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/table";
 import getMembers from "../actions/get-members";
 import MemberRow from "./member-row";
+import { MemberWithUser } from "../interfaces/member.interface";
 
 interface MembersTableProps {
   teamId: number;
@@ -29,7 +30,7 @@ export default async function MembersTable({ teamId }: MembersTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {members.map((member) => (
+        {members.map((member: MemberWithUser) => (
           <MemberRow key={member.id} member={member} />
         ))}
       </TableBody>

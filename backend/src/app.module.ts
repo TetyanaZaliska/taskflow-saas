@@ -5,6 +5,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './auth/auth.module';
 import { TeamsModule } from './teams/teams.module';
 import { TeamMembersModule } from './team-members/team-members.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TeamMembersModule } from './team-members/team-members.module';
     AuthModule,
     TeamsModule,
     TeamMembersModule,
+    ProjectsModule,
   ],
   controllers: [],
   providers: [],

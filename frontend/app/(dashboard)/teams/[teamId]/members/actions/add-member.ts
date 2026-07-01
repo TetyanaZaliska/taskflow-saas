@@ -11,8 +11,6 @@ export default async function addMember(teamId: number, formData: FormData) {
     return { error: "Invalid team id" };
   }
 
-  console.log(formData);
-
   const response = await post(
     getRouteName(routes.app.teamMembers(teamId)),
     formData,

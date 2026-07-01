@@ -34,12 +34,8 @@ export default function MemberRow({ member }: MemberRowProps) {
     <TableRow
       className={cn("cursor-pointer hover:bg-muted/50 transition-colors")}
     >
-      <TableCell onClick={handleRouteUser} className="font-medium">
-        {member.user.email}
-      </TableCell>
-      <TableCell onClick={handleRouteUser} className="text-right">
-        {member.role}
-      </TableCell>
+      <TableCell className="font-medium">{member.user.email}</TableCell>
+      <TableCell className="text-right">{member.role}</TableCell>
       <TableCell className="text-right">
         <Button onClick={handleRemove} variant="destructive" className="w-min">
           <Trash2 className="h-4 w-4" />
