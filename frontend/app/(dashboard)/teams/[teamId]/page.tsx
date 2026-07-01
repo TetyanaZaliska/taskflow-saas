@@ -3,6 +3,7 @@ import getTeam from "./get-team";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/app/common/constants/routes";
 import { assertNoErrors } from "@/app/common/util/error-redirect";
+import { formatDate } from "@/app/common/util/format-date";
 
 interface SingleTeamProps {
   params: Promise<{ teamId: string }>;
@@ -19,7 +20,7 @@ export default async function SingleTeam({ params }: SingleTeamProps) {
         {team.name}
       </h2>
       <h4 className="scroll-m-20 font-semibold tracking-tight text-muted-foreground">
-        {team.createdAt}
+        {formatDate(team.createdAt, true)}
       </h4>
       <p>Some details will be soon</p>
       <Button variant="outline" className="w-full" asChild>

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import removeTeam from "../actions/remove-team";
+import { formatDate } from "@/app/common/util/format-date";
 
 interface TeamRowProps {
   team: Team;
@@ -37,7 +38,7 @@ export default function TeamRow({ team }: TeamRowProps) {
       </TableCell>
       <TableCell onClick={handleRouteTeam}>{team.name}</TableCell>
       <TableCell onClick={handleRouteTeam} className="text-right">
-        {team.createdAt}
+        {formatDate(team.createdAt)}
       </TableCell>
       <TableCell className="text-right">
         <Button onClick={handleDelete} variant="destructive" className="w-min">
