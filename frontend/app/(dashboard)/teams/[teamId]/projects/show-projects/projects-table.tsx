@@ -31,7 +31,7 @@ export default async function ProjectsTable({ teamId }: ProjectsTableProps) {
       </TableHeader>
       <TableBody>
         {projects.map((project: Project) => (
-          <ProjectRow key={project.id} project={project} />
+          <ProjectRow key={project.id} project={project} teamId={teamId} />
         ))}
       </TableBody>
     </Table>

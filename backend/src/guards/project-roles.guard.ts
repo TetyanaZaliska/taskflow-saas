@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../prisma/prisma.service';
-import { TeamMember, TeamRole } from '@prisma/client';
+import { TeamRole } from '@prisma/client';
 import { TEAM_ROLES_KEY } from '../constants/constants';
 
 @Injectable()
-export class TeamRolesGuard implements CanActivate {
+export class ProjectRolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly prismaService: PrismaService,
@@ -20,23 +20,25 @@ export class TeamRolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    const teamId = Number(request.params.teamId); // || request.headers['x-team-id'];
+    const projectId = Number(request.params.projectId);
 
-    if (!user || isNaN(teamId)) {
-      throw new ForbiddenException('No team!');
+    if (!user || isNaN(projectId)) {
+      throw new ForbiddenException('You have no rights!');
     }
 
-    const membership = await this.prismaService.teamMember.findUnique({
+    const membership = await this.prismaService.teamMember.findFirst({
       where: {
-        userId_teamId: {
-          userId: user.userId,
-          teamId: teamId,
+        userId: user.userId,
+        team: {
+          projects: {
+            some: { id: projectId },
+          },
         },
       },
     });
 
     if (!membership) {
-      throw new ForbiddenException('You are not a part of this team');
+      throw new ForbiddenException('You have no access to the project.');
     }
 
     const requiredRoles = this.reflector.getAllAndOverride<TeamRole[]>(
@@ -45,10 +47,15 @@ export class TeamRolesGuard implements CanActivate {
     );
 
     if (!requiredRoles) {
-      //console.log('No roles required, skipping check.');
       return true;
     }
 
-    return requiredRoles.includes(membership.role);
+    const hasRequiredRole = requiredRoles.includes(membership.role);
+
+    if (!hasRequiredRole) {
+      throw new ForbiddenException('Not enough rights!');
+    }
+
+    return true;
   }
 }

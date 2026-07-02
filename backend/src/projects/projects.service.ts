@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectRequest } from './dto/create-project.request';
 
@@ -24,6 +24,22 @@ export class ProjectsService {
       orderBy: {
         createdAt: 'desc',
       },
+    });
+  }
+
+  async removeProject(teamId: number, projectId: number) {
+    const projectToRemove = await this.prismaService.project.findUnique({
+      where: {
+        id_teamId: { id: projectId, teamId: teamId },
+      },
+    });
+
+    if (!projectToRemove) {
+      throw new NotFoundException('Project not found for this team.');
+    }
+
+    return this.prismaService.project.delete({
+      where: { id: projectId },
     });
   }
 }

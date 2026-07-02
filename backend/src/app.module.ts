@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { TeamsModule } from './teams/teams.module';
 import { TeamMembersModule } from './team-members/team-members.module';
 import { ProjectsModule } from './projects/projects.module';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ProjectsModule } from './projects/projects.module';
     TeamsModule,
     TeamMembersModule,
     ProjectsModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [],

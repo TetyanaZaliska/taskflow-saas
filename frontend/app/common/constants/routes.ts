@@ -24,6 +24,7 @@ export const routes = {
       `/teams/${teamId}/projects` as const,
     settings: "/settings",
     users: "/users",
+    project: (projectId: string | number) => `/project/${projectId}` as const,
 
     // User
     profile: "/profile",

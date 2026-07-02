@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -34,5 +35,15 @@ export class ProjectsController {
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
   async getProjects(@Param('teamId', ParseIntPipe) teamId: number) {
     return this.projectsService.getProjects(teamId);
+  }
+
+  @Delete(':projectId')
+  @UseGuards(JwtAuthGuard, TeamRolesGuard)
+  @TeamRoles(TeamRole.ADMIN)
+  async removeProject(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('projectId', ParseIntPipe) projectId: number,
+  ) {
+    return this.projectsService.removeProject(teamId, projectId);
   }
 }
