@@ -1,11 +1,11 @@
 export const TASK_PRIORITY = {
-  TODO: "TODO",
-  IN_PROGRESS: "IN_PROGRESS",
-  DONE: "DONE",
+  LOW: "LOW",
+  MEDIUM: "MEDIUM",
+  HIGH: "HIGH",
 } as const;
 
 export const TASK_PRIORITY_LIST = [
-  { value: TASK_PRIORITY.TODO, label: "Todo" },
-  { value: TASK_PRIORITY.IN_PROGRESS, label: "In progress" },
-  { value: TASK_PRIORITY.DONE, label: "Done" },
+  { value: TASK_PRIORITY.LOW, label: "Low" },
+  { value: TASK_PRIORITY.MEDIUM, label: "Medium" },
+  { value: TASK_PRIORITY.HIGH, label: "High" },
 ];

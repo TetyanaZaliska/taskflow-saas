@@ -5,6 +5,7 @@ import { assertNoErrors } from "@/app/common/util/error-redirect";
 import { formatDate } from "@/app/common/util/format-date";
 import getProject from "./actions/get-project";
 import { redirect } from "next/navigation";
+import { toSlug } from "@/app/common/util/to-slug";
 
 interface SingleTeamProps {
   params: Promise<{ projectSlug: string }>;
@@ -15,13 +16,16 @@ export default async function Project({ params }: SingleTeamProps) {
   const projectId = parseInt(projectSlug.split("-")[0], 10);
 
   if (isNaN(projectId)) {
-    // Перенаправляємо на список проєктів команди
     redirect(routes.app.teams);
   }
 
   const project = await getProject(projectId);
 
   assertNoErrors(project, routes.app.teamProjects(project.teamId));
+
+  const taskLink = routes.app.projectTasks(
+    `${project.id}-${toSlug(project.name)}`,
+  );
 
   return (
     <>
@@ -36,7 +40,7 @@ export default async function Project({ params }: SingleTeamProps) {
       </h4>
       <p>Some details will be soon</p>
       <Button variant="outline" className="w-full" asChild>
-        <Link href={routes.app.projectTasks(project.id)}>Tasks</Link>
+        <Link href={taskLink}>Tasks</Link>
       </Button>
     </>
   );
