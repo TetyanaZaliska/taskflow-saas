@@ -12,8 +12,12 @@ model User {
   id         Int @id @default(autoincrement())
   email      String @unique
   password   String
+  isActive   Boolean @default(true)
 
   teams      TeamMember[]
+
+  createdTasks Task[] @relation("TaskAuthor")
+
 
   createdAt  DateTime @default(now())
 }
@@ -39,6 +43,8 @@ model TeamMember {
 
   role   TeamRole @default(MEMBER)
 
+  assignedTasks Task[] 
+
   createdAt DateTime @default(now())
 
   @@unique([userId, teamId])
@@ -57,8 +63,46 @@ model Project {
   teamId      Int
   team        Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
+  tasks       Task[]
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@unique([id, teamId]) 
+}
+
+
+model Task {
+  id          Int @id @default(autoincrement())
+  title       String
+  description String?
+
+  status      TaskStatus @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+
+  projectId   Int
+  project     Project @relation(fields: [projectId], references: [id],  onDelete: Cascade)
+
+  assigneeId  Int?
+  assignee    TeamMember? @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  authorId Int
+  author   User @relation("TaskAuthor", fields: [authorId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([id, projectId]) 
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
 }
