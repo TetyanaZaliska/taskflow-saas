@@ -5,9 +5,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import getProjects from "../actions/get-projects";
+import getProjects from "../../actions/get-projects";
 import ProjectRow from "./project-row";
-import { Project } from "../interfaces/project.interface";
+import { Project } from "../../interfaces/project.interface";
 
 interface ProjectsTableProps {
   teamId: number;

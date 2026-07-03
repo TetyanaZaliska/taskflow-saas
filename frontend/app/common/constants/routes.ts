@@ -17,14 +17,16 @@ export const routes = {
     projects: "/projects",
     activities: "/activities",
     teams: "/teams",
+    settings: "/settings",
+    users: "/users",
     team: (teamId: string | number) => `/teams/${teamId}` as const,
     teamMembers: (teamId: string | number) =>
       `/teams/${teamId}/members` as const,
     teamProjects: (teamId: string | number) =>
       `/teams/${teamId}/projects` as const,
-    settings: "/settings",
-    users: "/users",
     project: (projectId: string | number) => `/project/${projectId}` as const,
+    projectTasks: (projectId: string | number) =>
+      `/project/${projectId}/tasks` as const,
 
     // User
     profile: "/profile",

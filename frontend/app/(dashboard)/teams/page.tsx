@@ -1,5 +1,5 @@
-import { CreateTeamModal } from "./create-team/create-team-modal";
-import TeamsTable from "./show-teams/teams-table";
+import { CreateTeamModal } from "./components/create-team/create-team-modal";
+import TeamsTable from "./components/show-teams/teams-table";
 
 export default function Teams() {
   return (

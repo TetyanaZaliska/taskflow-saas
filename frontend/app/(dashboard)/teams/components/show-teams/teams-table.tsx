@@ -6,8 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import getTeams from "../actions/get-teams";
+import getTeams from "../../actions/get-teams";
 import TeamRow from "./team-row";
+import { Team } from "../../interfaces/team.interface";
 
 export default async function TeamsTable() {
   const teams = await getTeams();
@@ -24,7 +25,7 @@ export default async function TeamsTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {teams.map((team) => (
+        {teams.map((team: Team) => (
           <TeamRow key={team.id} team={team} />
         ))}
       </TableBody>

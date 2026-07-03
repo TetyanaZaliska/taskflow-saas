@@ -1,8 +1,8 @@
 import { routes } from "@/app/common/constants/routes";
 import getTeam from "../get-team";
 import { assertNoErrors } from "@/app/common/util/error-redirect";
-import { CreateProjectModal } from "./create-project/create-project-modal";
-import ProjectsTable from "./show-projects/projects-table";
+import { CreateProjectModal } from "./componets/create-project/create-project-modal";
+import ProjectsTable from "./componets/show-projects/projects-table";
 
 interface MembersProps {
   params: Promise<{ teamId: string }>;

@@ -29,12 +29,10 @@ export class ProjectsService {
 
   async removeProject(teamId: number, projectId: number) {
     const projectToRemove = await this.prismaService.project.findUnique({
-      where: {
-        id_teamId: { id: projectId, teamId: teamId },
-      },
+      where: { id: projectId },
     });
 
-    if (!projectToRemove) {
+    if (!projectToRemove || projectToRemove.teamId !== teamId) {
       throw new NotFoundException('Project not found for this team.');
     }
 

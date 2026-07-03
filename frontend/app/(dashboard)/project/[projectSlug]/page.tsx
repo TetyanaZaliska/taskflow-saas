@@ -36,7 +36,7 @@ export default async function Project({ params }: SingleTeamProps) {
       </h4>
       <p>Some details will be soon</p>
       <Button variant="outline" className="w-full" asChild>
-        <Link href="{routes.app.teamMembers(project.id)}">Task??</Link>
+        <Link href={routes.app.projectTasks(project.id)}>Tasks</Link>
       </Button>
     </>
   );

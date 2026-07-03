@@ -67,8 +67,6 @@ model Project {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  @@unique([id, teamId]) 
 }
 
 
@@ -92,7 +90,6 @@ model Task {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([id, projectId]) 
 }
 
 enum TaskStatus {

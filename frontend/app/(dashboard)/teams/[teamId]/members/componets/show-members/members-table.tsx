@@ -5,9 +5,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import getMembers from "../actions/get-members";
+import getMembers from "../../actions/get-members";
 import MemberRow from "./member-row";
-import { MemberWithUser } from "../interfaces/member.interface";
+import { MemberWithUser } from "../../interfaces/member.interface";
 
 interface MembersTableProps {
   teamId: number;

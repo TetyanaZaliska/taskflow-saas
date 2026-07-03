@@ -13,38 +13,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { CirclePlus, UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
-import { InputGroupAddon } from "@/components/ui/input-group";
-import { User } from "../../members/interfaces/user.interface";
-import createProject from "../actions/create-project";
+import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { CirclePlus } from "lucide-react";
+import { useState } from "react";
+import createTeam from "../../actions/create-team";
 
-interface CreateProjectModalProps {
-  teamId: number;
-}
-
-export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
+export function CreateTeamModal() {
   const [modalVisible, setModalVisible] = useState(false);
   const [response, setResponse] = useState<FormResponse>();
-
-  const createProjectAction = createProject.bind(null, teamId);
 
   const onClose = () => {
     setResponse(undefined);
@@ -55,13 +33,13 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
       <DialogTrigger asChild>
         <Button type="button" variant="outline">
-          <CirclePlus /> Create Project
+          <CirclePlus /> Create Team
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <form
           action={async (formData) => {
-            const response = await createProjectAction(formData);
+            const response = await createTeam(formData);
             setResponse(response);
             if (!response.error) {
               onClose();
@@ -69,32 +47,22 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
           }}
         >
           <DialogHeader>
-            <DialogTitle>Create a new project</DialogTitle>
+            <DialogTitle>Create your team</DialogTitle>
             <DialogDescription>
-              Choose name for your new project and input description.
+              Choose name for your new team.
             </DialogDescription>
           </DialogHeader>
-          <FieldGroup className="mb-5">
+          <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Name</FieldLabel>
+              <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
-                placeholder="Some Project"
+                placeholder="Frontend Team"
                 required
               />
             </Field>
-
-            <Field>
-              <FieldLabel htmlFor="description">Description</FieldLabel>
-              <Textarea
-                placeholder="Type your description here..."
-                id="description"
-                name="description"
-              />
-            </Field>
-
             {!!response?.error && (
               <AlertBox message={response.error}></AlertBox>
             )}

@@ -16,7 +16,6 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field";
 import { CirclePlus, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
-import addMember from "../actions/add-member";
 import {
   Combobox,
   ComboboxContent,
@@ -27,8 +26,9 @@ import {
 } from "@/components/ui/combobox";
 import { InputGroupAddon } from "@/components/ui/input-group";
 import { ChooseRole } from "./choose-role";
-import { User } from "../interfaces/user.interface";
-import { searchUsers } from "../actions/search-users";
+import { User } from "../../interfaces/user.interface";
+import addMember from "../../actions/add-member";
+import { searchUsers } from "../../actions/search-users";
 
 interface AddMemberModalProps {
   teamId: number;

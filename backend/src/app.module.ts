@@ -7,6 +7,7 @@ import { TeamsModule } from './teams/teams.module';
 import { TeamMembersModule } from './team-members/team-members.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ProjectModule } from './project/project.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ProjectModule } from './project/project.module';
     TeamMembersModule,
     ProjectsModule,
     ProjectModule,
+    TasksModule,
   ],
   controllers: [],
   providers: [],

@@ -41,6 +41,12 @@ export class AuthService {
     try {
       const user = await this.usersService.getUser({ email });
 
+      if (!user || !user.isActive) {
+        throw new UnauthorizedException(
+          'Your account deactivated. Contact to support.',
+        );
+      }
+
       const authenticated = await bcrypt.compare(password, user.password);
       if (!authenticated) {
         throw new UnauthorizedException();

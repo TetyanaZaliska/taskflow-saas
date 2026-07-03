@@ -3,11 +3,11 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Member, MemberWithUser } from "../interfaces/member.interface";
+import { Member, MemberWithUser } from "../../interfaces/member.interface";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/app/common/constants/routes";
-import removeMember from "../actions/remove-member";
+import removeMember from "../../actions/remove-member";
 import { toast } from "sonner";
 
 interface MemberRowProps {

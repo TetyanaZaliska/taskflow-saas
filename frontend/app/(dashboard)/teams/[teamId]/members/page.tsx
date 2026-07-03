@@ -1,8 +1,8 @@
 import { routes } from "@/app/common/constants/routes";
 import getTeam from "../get-team";
-import { AddMemberModal } from "./add-member/add-member-modal";
-import MembersTable from "./show-members/members-table";
+import MembersTable from "./componets/show-members/members-table";
 import { assertNoErrors } from "@/app/common/util/error-redirect";
+import { AddMemberModal } from "./componets/add-member/add-member-modal";
 
 interface MembersProps {
   params: Promise<{ teamId: string }>;

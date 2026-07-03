@@ -1,14 +1,14 @@
 "use client";
 
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Team } from "../interfaces/team.interface";
+import { Team } from "../../interfaces/team.interface";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { routes } from "@/app/common/constants/routes";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import removeTeam from "../actions/remove-team";
+import removeTeam from "../../actions/remove-team";
 import { formatDate } from "@/app/common/util/format-date";
 
 interface TeamRowProps {
