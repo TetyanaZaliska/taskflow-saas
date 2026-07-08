@@ -22,7 +22,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ProjectRolesGuard)
   async createTask(
     @Param('projectId', ParseIntPipe) projectId: number,
     @Body() body: CreateTaskRequest,
@@ -37,9 +37,8 @@ export class TasksController {
     return this.tasksService.getProjectTasks(projectId);
   }
 
-  @Delete()
-  @UseGuards(JwtAuthGuard, ProjectRolesGuard)
-  @TeamRoles(TeamRole.ADMIN)
+  @Delete(':taskId')
+  @UseGuards(JwtAuthGuard)
   async removeTask(
     @Param('taskId', ParseIntPipe) taskId: number,
     @CurrentUser() user: TokenPayload,
