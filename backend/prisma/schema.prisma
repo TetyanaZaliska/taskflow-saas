@@ -63,6 +63,7 @@ model Project {
   teamId      Int
   team        Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
+  nextTaskKey Int    @default(1) 
   tasks       Task[]
 
   createdAt   DateTime @default(now())
@@ -72,6 +73,7 @@ model Project {
 
 model Task {
   id          Int @id @default(autoincrement())
+  keyNumber   Int
   title       String
   description String?
 

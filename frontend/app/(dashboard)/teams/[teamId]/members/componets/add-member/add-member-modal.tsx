@@ -29,6 +29,7 @@ import { ChooseRole } from "./choose-role";
 import { User } from "../../interfaces/user.interface";
 import addMember from "../../actions/add-member";
 import { searchUsers } from "../../actions/search-users";
+import { ButtonCreate } from "@/components/custom/button-create";
 
 interface AddMemberModalProps {
   teamId: number;
@@ -74,9 +75,7 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
       <DialogTrigger asChild>
-        <Button type="button" variant="outline">
-          <CirclePlus /> Add Member
-        </Button>
+        <ButtonCreate title="Add Member" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <form

@@ -10,6 +10,7 @@ import removeProject from "../../actions/remove-project";
 import { useRouter } from "next/navigation";
 import { routes } from "@/app/common/constants/routes";
 import { toSlug } from "@/app/common/util/to-slug";
+import { ButtonDelete } from "@/components/custom/button-delete";
 
 interface ProjectRowProps {
   project: Project;
@@ -22,7 +23,7 @@ export default function ProjectRow({ project, teamId }: ProjectRowProps) {
   const handleRouteUser = () =>
     router.push(routes.app.project(`${project.id}-${toSlug(project.name)}`));
 
-  const handleRemove = async () => {
+  const handleRemoveProject = async () => {
     const res = await removeProject(teamId, project.id);
 
     if (res?.error) {
@@ -53,9 +54,7 @@ export default function ProjectRow({ project, teamId }: ProjectRowProps) {
         </div>
       </TableCell>
       <TableCell className="text-right">
-        <Button onClick={handleRemove} variant="destructive" className="w-min">
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <ButtonDelete onClick={handleRemoveProject} />
       </TableCell>
     </TableRow>
   );

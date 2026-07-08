@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { routes } from "@/app/common/constants/routes";
 import removeMember from "../../actions/remove-member";
 import { toast } from "sonner";
+import { ButtonDelete } from "@/components/custom/button-delete";
 
 interface MemberRowProps {
   member: MemberWithUser;
@@ -20,7 +21,7 @@ export default function MemberRow({ member }: MemberRowProps) {
   const handleRouteUser = () =>
     router.push(`${routes.app.teamMembers(member.teamId)}/${member.user.id}`);
 
-  const handleRemove = async () => {
+  const handleRemoveMember = async () => {
     const res = await removeMember(member.teamId, member.user.id);
 
     if (res?.error) {
@@ -37,9 +38,7 @@ export default function MemberRow({ member }: MemberRowProps) {
       <TableCell className="font-medium">{member.user.email}</TableCell>
       <TableCell className="text-right">{member.role}</TableCell>
       <TableCell className="text-right">
-        <Button onClick={handleRemove} variant="destructive" className="w-min">
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <ButtonDelete onClick={handleRemoveMember} />
       </TableCell>
     </TableRow>
   );

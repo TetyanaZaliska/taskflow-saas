@@ -16,9 +16,9 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CirclePlus } from "lucide-react";
 import { useState } from "react";
 import createTeam from "../../actions/create-team";
+import { ButtonCreate } from "@/components/custom/button-create";
 
 export function CreateTeamModal() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,9 +32,7 @@ export function CreateTeamModal() {
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
       <DialogTrigger asChild>
-        <Button type="button" variant="outline">
-          <CirclePlus /> Create Team
-        </Button>
+        <ButtonCreate title="Create Team" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <form

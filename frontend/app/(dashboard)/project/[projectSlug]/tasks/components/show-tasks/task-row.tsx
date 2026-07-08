@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { routes } from "@/app/common/constants/routes";
 import { toast } from "sonner";
 import { Task } from "../../interfaces/task.interface";
+import { ButtonDelete } from "@/components/custom/button-delete";
 
 interface TaskRowProps {
   task: Task;
@@ -19,13 +20,13 @@ export default function TaskRow({ task }: TaskRowProps) {
   //const handleRouteUser = () =>
   //  router.push(`${routes.app.teamMembers(member.teamId)}/${member.user.id}`);
 
-  //const handleRemove = async () => {
-  //  const res = await removeMember(member.teamId, member.user.id);
+  //const handleRemoveTask = async () => {
+  //  const res = await removeTask(member.teamId, member.user.id);
   //
   //  if (res?.error) {
   //    toast.error(res.error, { position: "top-right" });
   //  } else {
-  //    toast.success("Team member was deleted!", { position: "top-right" });
+  //    toast.success("Task was successfully deleted!", { position: "top-right" });
   //  }
   //};
 
@@ -39,9 +40,7 @@ export default function TaskRow({ task }: TaskRowProps) {
       <TableCell className="text-right">{task.authorId}</TableCell>
       <TableCell className="text-right">{task.createdAt}</TableCell>
       <TableCell className="text-right">
-        <Button variant="destructive" className="w-min">
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <ButtonDelete />
       </TableCell>
     </TableRow>
   );

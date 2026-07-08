@@ -35,6 +35,7 @@ import createProject from "../../actions/create-project";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ButtonCreate } from "@/components/custom/button-create";
 
 interface CreateProjectModalProps {
   teamId: number;
@@ -54,9 +55,7 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
       <DialogTrigger asChild>
-        <Button type="button" variant="outline">
-          <CirclePlus /> Create Project
-        </Button>
+        <ButtonCreate title="Create Project" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <form

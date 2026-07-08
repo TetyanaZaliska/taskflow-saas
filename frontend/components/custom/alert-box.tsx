@@ -8,7 +8,7 @@ interface AlertBoxProps {
 export function AlertBox({ message }: AlertBoxProps) {
   return (
     <Alert variant="destructive" className="max-w-md">
-      <AlertCircleIcon />
+      <AlertCircleIcon className="h-4 w-4" />
       <AlertTitle>Failed</AlertTitle>
       <AlertDescription>{message}</AlertDescription>
     </Alert>
