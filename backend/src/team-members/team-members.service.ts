@@ -52,6 +52,7 @@ export class TeamMembersService {
       select: {
         id: true,
         teamId: true,
+        userId: true,
         role: true,
         user: {
           select: {

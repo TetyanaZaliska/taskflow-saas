@@ -16,7 +16,7 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { ButtonCreate } from "@/components/custom/button-create";
 import createTask from "../../actions/create-task";
 import { TaskSelect } from "./task-select";
@@ -37,23 +37,46 @@ interface CreateTaskModalProps {
 
 export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [response, setResponse] = useState<FormResponse>();
   const [status, setStatus] = useState<string>(TASK_STATUS_LIST[0].value);
   const [priority, setPriority] = useState<string>(TASK_PRIORITY_LIST[0].value);
   const [members, setMembers] = useState<MemberWithUser[]>([]);
   const [assigneeId, setAssigneeId] = useState<string>("");
 
-  const onClose = () => {
-    setResponse(undefined);
-    setModalVisible(false);
+  const resetFormToDefault = () => {
+    setStatus(TASK_STATUS_LIST[0].value);
+    setPriority(TASK_PRIORITY_LIST[0].value);
+    setAssigneeId("");
+  };
+
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: unknown, formData: FormData) => {
+      formData.append("status", status);
+      formData.append("priority", priority);
+      formData.append("assigneeId", assigneeId);
+
+      const res = await createTask(projectId, formData);
+      if (!res.error) {
+        setModalVisible(false);
+        resetFormToDefault();
+      }
+      return res;
+    },
+    null,
+  );
+
+  const handleOpenChange = (visible: boolean) => {
+    setModalVisible(visible);
+    if (!visible) {
+      resetFormToDefault();
+    }
   };
 
   useEffect(() => {
     if (modalVisible) {
       getMembers(teamId).then((data) => {
         if (!data.error && Array.isArray(data)) {
-          //const activeMembers = data.filter((m) => m.user.isActive);
-          setMembers(data);
+          const activeMembers = data.filter((m) => m.user.isActive);
+          setMembers(activeMembers);
         }
       });
     }
@@ -67,31 +90,19 @@ export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
       color: "text-muted-foreground",
     },
     ...members.map((member) => ({
-      value: String(member.id),
+      value: String(member.user.id),
       label: member.user.email,
       icon: UserIcon,
     })),
   ];
 
   return (
-    <Dialog open={modalVisible} onOpenChange={setModalVisible}>
+    <Dialog open={modalVisible} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <ButtonCreate title="Create Task" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
-        <form
-          action={async (formData) => {
-            formData.append("status", status);
-            formData.append("priority", priority);
-            formData.append("assigneeId", assigneeId);
-
-            const response = await createTask(projectId, formData);
-            setResponse(response);
-            if (!response.error) {
-              onClose();
-            }
-          }}
-        >
+        <form action={formAction}>
           <DialogHeader>
             <DialogTitle>Create new task</DialogTitle>
             <DialogDescription>
@@ -145,15 +156,21 @@ export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
                 className="w-[168px]"
               />
             </div>
-            <FormError error={response?.error} />
+            <FormError error={state?.error} />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resetFormToDefault}
+              >
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Submitting..." : "Submit"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
