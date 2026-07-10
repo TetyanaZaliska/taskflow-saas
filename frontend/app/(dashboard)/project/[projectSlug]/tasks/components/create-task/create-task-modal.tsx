@@ -13,32 +13,65 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Field, FieldGroup } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonCreate } from "@/components/custom/button-create";
 import createTask from "../../actions/create-task";
-import { ChoosePriority } from "./choose-priority";
-import { ChooseStatus } from "./choose-status";
 import { TaskSelect } from "./task-select";
 import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
 import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
+import getProject from "../../../actions/get-project";
+import { Project } from "../../../interfaces/project.interface";
+import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
+import getMembers from "@/app/(dashboard)/teams/[teamId]/members/actions/get-members";
+import { UserIcon } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { FormError } from "@/components/custom/form-error";
 
 interface CreateTaskModalProps {
   projectId: number;
+  teamId: number;
 }
 
-export function CreateTaskModal({ projectId }: CreateTaskModalProps) {
+export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [response, setResponse] = useState<FormResponse>();
   const [status, setStatus] = useState<string>(TASK_STATUS_LIST[0].value);
   const [priority, setPriority] = useState<string>(TASK_PRIORITY_LIST[0].value);
+  const [members, setMembers] = useState<MemberWithUser[]>([]);
+  const [assigneeId, setAssigneeId] = useState<string>("");
 
   const onClose = () => {
     setResponse(undefined);
     setModalVisible(false);
   };
+
+  useEffect(() => {
+    if (modalVisible) {
+      getMembers(teamId).then((data) => {
+        if (!data.error && Array.isArray(data)) {
+          //const activeMembers = data.filter((m) => m.user.isActive);
+          setMembers(data);
+        }
+      });
+    }
+  }, [modalVisible, teamId]);
+
+  const mappedMembers = [
+    {
+      value: "",
+      label: "No assignee",
+      icon: UserIcon,
+      color: "text-muted-foreground",
+    },
+    ...members.map((member) => ({
+      value: String(member.id),
+      label: member.user.email,
+      icon: UserIcon,
+    })),
+  ];
 
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
@@ -48,6 +81,10 @@ export function CreateTaskModal({ projectId }: CreateTaskModalProps) {
       <DialogContent className="sm:max-w-sm">
         <form
           action={async (formData) => {
+            formData.append("status", status);
+            formData.append("priority", priority);
+            formData.append("assigneeId", assigneeId);
+
             const response = await createTask(projectId, formData);
             setResponse(response);
             if (!response.error) {
@@ -63,7 +100,7 @@ export function CreateTaskModal({ projectId }: CreateTaskModalProps) {
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <Label htmlFor="title">Title</Label>
+              <FieldLabel>Title</FieldLabel>
               <Input
                 id="title"
                 name="title"
@@ -72,6 +109,26 @@ export function CreateTaskModal({ projectId }: CreateTaskModalProps) {
                 required
               />
             </Field>
+
+            <Field>
+              <FieldLabel>Description</FieldLabel>
+              <Textarea
+                placeholder="Type your description here..."
+                id="description"
+                name="description"
+              />
+            </Field>
+
+            <div className="flex flex-col gap-1.5">
+              <TaskSelect
+                items={mappedMembers}
+                value={assigneeId}
+                onChange={setAssigneeId}
+                placeholder="Search team member..."
+                className="w-full"
+              />
+            </div>
+
             <div className="flex items-center gap-4 mb-4">
               <TaskSelect
                 items={TASK_STATUS_LIST}
@@ -88,9 +145,7 @@ export function CreateTaskModal({ projectId }: CreateTaskModalProps) {
                 className="w-[168px]"
               />
             </div>
-            {!!response?.error && (
-              <AlertBox message={response.error}></AlertBox>
-            )}
+            <FormError error={response?.error} />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>

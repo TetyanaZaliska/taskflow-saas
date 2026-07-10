@@ -36,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ButtonCreate } from "@/components/custom/button-create";
+import { FormError } from "@/components/custom/form-error";
 
 interface CreateProjectModalProps {
   teamId: number;
@@ -94,9 +95,7 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
               />
             </Field>
 
-            {!!response?.error && (
-              <AlertBox message={response.error}></AlertBox>
-            )}
+            <FormError error={response?.error} />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>

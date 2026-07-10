@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import createTeam from "../../actions/create-team";
 import { ButtonCreate } from "@/components/custom/button-create";
+import { FormError } from "@/components/custom/form-error";
 
 export function CreateTeamModal() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -61,9 +62,7 @@ export function CreateTeamModal() {
                 required
               />
             </Field>
-            {!!response?.error && (
-              <AlertBox message={response.error}></AlertBox>
-            )}
+            <FormError error={response?.error} />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>

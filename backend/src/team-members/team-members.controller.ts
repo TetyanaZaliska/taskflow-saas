@@ -34,11 +34,8 @@ export class TeamMembersController {
 
   @Get()
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
-  async getMembers(
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @CurrentUser() user: TokenPayload,
-  ) {
-    return this.teamMemberService.getMembers(teamId, user.userId);
+  async getMembers(@Param('teamId', ParseIntPipe) teamId: number) {
+    return this.teamMemberService.getMembers(teamId);
   }
 
   @Delete(':memberId')

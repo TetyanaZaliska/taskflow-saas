@@ -57,7 +57,7 @@ export function TaskSelect({
             <span className="text-sm font-medium">{currentItem.label}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-[180px] p-0">
+        <PopoverContent align="start" className="p-0 w-full">
           <Command>
             <CommandInput placeholder={placeholder} />
             <CommandList>
@@ -69,7 +69,7 @@ export function TaskSelect({
                   return (
                     <CommandItem
                       key={item.value}
-                      value={item.value}
+                      value={item.label.toLowerCase()}
                       onSelect={() => {
                         onChange(item.value);
                         setOpen(false);

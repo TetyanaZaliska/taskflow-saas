@@ -26,7 +26,7 @@ export default async function Tasks({ params }: TasksProps) {
       <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
         {project.name}
       </h2>
-      <CreateTaskModal />
+      <CreateTaskModal projectId={projectId} teamId={project.teamId} />
       <TasksTable projectId={projectId} />
     </>
   );

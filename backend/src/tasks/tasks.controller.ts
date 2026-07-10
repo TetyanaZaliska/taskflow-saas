@@ -14,8 +14,6 @@ import { ProjectRolesGuard } from '../guards/project-roles.guard';
 import { CreateTaskRequest } from './dto/create-task.request';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
-import { TeamRoles } from '../teams/team-roles.decorator';
-import { TeamRole } from '@prisma/client';
 
 @Controller('project/:projectId/tasks')
 export class TasksController {

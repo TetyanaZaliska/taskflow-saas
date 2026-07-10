@@ -44,7 +44,7 @@ export class TeamMembersService {
     }
   }
 
-  async getMembers(teamId: number, currentUserId: number) {
+  async getMembers(teamId: number) {
     return this.prismaService.teamMember.findMany({
       where: {
         teamId,
@@ -57,6 +57,7 @@ export class TeamMembersService {
           select: {
             id: true,
             email: true,
+            isActive: true,
           },
         },
       },

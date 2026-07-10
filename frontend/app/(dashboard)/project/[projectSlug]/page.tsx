@@ -6,6 +6,7 @@ import { formatDate } from "@/app/common/util/format-date";
 import getProject from "./actions/get-project";
 import { redirect } from "next/navigation";
 import { toSlug } from "@/app/common/util/to-slug";
+import { type Project } from "./interfaces/project.interface";
 
 interface SingleTeamProps {
   params: Promise<{ projectSlug: string }>;
@@ -19,7 +20,7 @@ export default async function Project({ params }: SingleTeamProps) {
     redirect(routes.app.teams);
   }
 
-  const project = await getProject(projectId);
+  const project: Project = await getProject(projectId);
 
   assertNoErrors(project, routes.app.teamProjects(project.teamId));
 

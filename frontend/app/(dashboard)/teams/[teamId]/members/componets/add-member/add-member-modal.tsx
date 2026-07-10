@@ -30,6 +30,7 @@ import { User } from "../../interfaces/user.interface";
 import addMember from "../../actions/add-member";
 import { searchUsers } from "../../actions/search-users";
 import { ButtonCreate } from "@/components/custom/button-create";
+import { FormError } from "@/components/custom/form-error";
 
 interface AddMemberModalProps {
   teamId: number;
@@ -121,9 +122,7 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
 
             <ChooseRole />
 
-            {!!response?.error && (
-              <AlertBox message={response.error}></AlertBox>
-            )}
+            <FormError error={response?.error} />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
