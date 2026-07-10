@@ -9,5 +9,5 @@ export const formatDate = (isoDate: string, fullDate?: boolean) => {
     options.timeStyle = "short";
   }
 
-  return new Intl.DateTimeFormat(undefined, options).format(date);
+  return new Intl.DateTimeFormat("en-US", options).format(date);
 };

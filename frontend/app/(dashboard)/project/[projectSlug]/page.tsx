@@ -38,6 +38,7 @@ export default async function Project({ params }: SingleTeamProps) {
       <h4 className="scroll-m-20 font-semibold tracking-tight text-muted-foreground">
         {formatDate(project.updatedAt, true)}
       </h4>
+      <p>{project.description}</p>
       <p>Some details will be soon</p>
       <Button variant="outline" className="w-full" asChild>
         <Link href={taskLink}>Tasks</Link>

@@ -18,10 +18,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { ButtonCreate } from "@/components/custom/button-create";
+import createTask from "../../actions/create-task";
+import { ChoosePriority } from "./choose-priority";
+import { ChooseStatus } from "./choose-status";
+import { TaskSelect } from "./task-select";
+import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
+import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
 
-export function CreateTaskModal() {
+interface CreateTaskModalProps {
+  projectId: number;
+}
+
+export function CreateTaskModal({ projectId }: CreateTaskModalProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [response, setResponse] = useState<FormResponse>();
+  const [status, setStatus] = useState<string>(TASK_STATUS_LIST[0].value);
+  const [priority, setPriority] = useState<string>(TASK_PRIORITY_LIST[0].value);
 
   const onClose = () => {
     setResponse(undefined);
@@ -36,7 +48,7 @@ export function CreateTaskModal() {
       <DialogContent className="sm:max-w-sm">
         <form
           action={async (formData) => {
-            const response = await createTask(formData);
+            const response = await createTask(projectId, formData);
             setResponse(response);
             if (!response.error) {
               onClose();
@@ -51,15 +63,31 @@ export function CreateTaskModal() {
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="title">Title</Label>
               <Input
-                id="name"
-                name="name"
+                id="title"
+                name="title"
                 type="text"
-                placeholder="Frontend Team"
+                placeholder="Task title"
                 required
               />
             </Field>
+            <div className="flex items-center gap-4 mb-4">
+              <TaskSelect
+                items={TASK_STATUS_LIST}
+                value={status}
+                onChange={setStatus}
+                placeholder="Change status to..."
+                className="w-[168px]"
+              />
+              <TaskSelect
+                items={TASK_PRIORITY_LIST}
+                value={priority}
+                onChange={setPriority}
+                placeholder="Change priority to..."
+                className="w-[168px]"
+              />
+            </div>
             {!!response?.error && (
               <AlertBox message={response.error}></AlertBox>
             )}
