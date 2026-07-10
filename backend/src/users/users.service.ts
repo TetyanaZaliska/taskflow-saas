@@ -1,7 +1,11 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateUserRequest } from './dto/create-user.request';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -31,9 +35,15 @@ export class UsersService {
   }
 
   async getUser(filter: Prisma.UserWhereUniqueInput) {
-    return this.prismaService.user.findUniqueOrThrow({
+    const user = await this.prismaService.user.findUniqueOrThrow({
       where: filter,
     });
+
+    if (!user.isActive) {
+      throw new ForbiddenException('This user account has been deactivated.');
+    }
+
+    return user;
   }
 
   async searchUsers(query: string) {
@@ -43,14 +53,11 @@ export class UsersService {
 
     return this.prismaService.user.findMany({
       where: {
-        OR: [
-          {
-            email: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-        ],
+        isActive: true,
+        email: {
+          contains: query,
+          mode: 'insensitive',
+        },
       },
       select: {
         id: true,
