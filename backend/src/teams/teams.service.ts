@@ -1,16 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTeamRequest } from './dto/create-team.request';
 import { PrismaService } from '../prisma/prisma.service';
 import { TeamRole } from '@prisma/client';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
 export class TeamsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly permissionsService: PermissionsService,
+  ) {}
 
   async createTeam(data: CreateTeamRequest, userId: number) {
     return await this.prismaService.team.create({
       data: {
         name: data.name,
+        ownerId: userId,
         members: {
           create: {
             userId,
@@ -34,30 +43,44 @@ export class TeamsService {
   }
 
   async getTeam(teamId: number, userId: number) {
-    try {
-      return await this.prismaService.team.findUniqueOrThrow({
-        where: { id: teamId },
-      });
-    } catch (err) {
+    await this.permissionsService.validateTeamAccess(userId, teamId);
+
+    const team = await this.prismaService.team.findUnique({
+      where: { id: teamId },
+    });
+
+    if (!team) {
       throw new NotFoundException(`Team not found with id ${teamId}`);
     }
+
+    return team;
   }
 
-  async removeTeam(teamId: number) {
-    return this.prismaService.$transaction(async (tx) => {
-      const teamToDelete = await tx.team.findUnique({
-        where: { id: teamId },
-      });
-
-      if (!teamToDelete) {
-        throw new NotFoundException('Team not found.');
-      }
-
-      const deletedTeam = await tx.team.delete({
-        where: { id: teamId },
-      });
-
-      return deletedTeam;
+  async removeTeam(teamId: number, userId: number) {
+    const teamToDelete = await this.prismaService.team.findUnique({
+      where: { id: teamId },
     });
+
+    if (!teamToDelete) {
+      throw new NotFoundException('Team not found.');
+    }
+
+    const canRemove = await this.permissionsService.canManageTeamResources(
+      userId,
+      teamId,
+      teamToDelete.ownerId,
+    );
+
+    if (!canRemove) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this team. Only the owner or an administrator can do this.',
+      );
+    }
+
+    const deletedTeam = await this.prismaService.team.delete({
+      where: { id: teamId },
+    });
+
+    return deletedTeam;
   }
 }

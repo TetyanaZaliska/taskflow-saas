@@ -31,15 +31,11 @@ export class ProjectRolesGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
-    const hasAccess = await this.permissionsService.hasProjectAccess(
+    await this.permissionsService.validateProjectAccess(
       user.userId,
       projectId,
       requiredRoles,
     );
-
-    if (!hasAccess) {
-      throw new ForbiddenException('You have no access to the project.');
-    }
 
     return true;
   }

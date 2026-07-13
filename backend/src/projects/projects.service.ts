@@ -1,22 +1,39 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectRequest } from './dto/create-project.request';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly permissionsService: PermissionsService,
+  ) {}
 
-  async createProject(teamId: number, data: CreateProjectRequest) {
+  async createProject(
+    teamId: number,
+    data: CreateProjectRequest,
+    userId: number,
+  ) {
+    await this.permissionsService.validateTeamAccess(userId, teamId);
+
     return await this.prismaService.project.create({
       data: {
         name: data.name,
         description: data.description,
         teamId: teamId,
+        authorId: userId,
       },
     });
   }
 
-  async getProjects(teamId: number) {
+  async getProjects(teamId: number, userId: number) {
+    await this.permissionsService.validateTeamAccess(userId, teamId);
+
     return this.prismaService.project.findMany({
       where: {
         teamId: teamId,
@@ -27,13 +44,25 @@ export class ProjectsService {
     });
   }
 
-  async removeProject(teamId: number, projectId: number) {
+  async removeProject(teamId: number, projectId: number, userId: number) {
     const projectToRemove = await this.prismaService.project.findUnique({
       where: { id: projectId },
     });
 
     if (!projectToRemove || projectToRemove.teamId !== teamId) {
       throw new NotFoundException('Project not found for this team.');
+    }
+
+    const canRemove = await this.permissionsService.canManageTeamResources(
+      userId,
+      teamId,
+      projectToRemove.authorId,
+    );
+
+    if (!canRemove) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this project. Only the author or a team admins can do this.',
+      );
     }
 
     return this.prismaService.project.delete({

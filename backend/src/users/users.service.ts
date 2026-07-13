@@ -46,7 +46,11 @@ export class UsersService {
     return user;
   }
 
-  async searchUsers(query: string) {
+  async searchUsers(query: string, curUserId: number) {
+    if (!curUserId || isNaN(curUserId)) {
+      throw new ForbiddenException('Access denied. Authentication required.');
+    }
+
     if (!query?.trim()) {
       return [];
     }

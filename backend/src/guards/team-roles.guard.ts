@@ -5,15 +5,15 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PrismaService } from '../prisma/prisma.service';
 import { TeamRole } from '@prisma/client';
 import { TEAM_ROLES_KEY } from '../constants/constants';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
 export class TeamRolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly prismaService: PrismaService,
+    private readonly permissionsService: PermissionsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,30 +25,17 @@ export class TeamRolesGuard implements CanActivate {
     if (!user || isNaN(teamId)) {
       throw new ForbiddenException('No team!');
     }
-
-    const membership = await this.prismaService.teamMember.findUnique({
-      where: {
-        userId_teamId: {
-          userId: user.userId,
-          teamId: teamId,
-        },
-      },
-    });
-
-    if (!membership) {
-      throw new ForbiddenException('You are not a part of this team');
-    }
-
     const requiredRoles = this.reflector.getAllAndOverride<TeamRole[]>(
       TEAM_ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
 
-    if (!requiredRoles) {
-      //console.log('No roles required, skipping check.');
-      return true;
-    }
+    await this.permissionsService.validateTeamAccess(
+      user.userId,
+      teamId,
+      requiredRoles,
+    );
 
-    return requiredRoles.includes(membership.role);
+    return true;
   }
 }

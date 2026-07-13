@@ -31,7 +31,10 @@ export class UsersController {
 
   @Get('search')
   @UseGuards(JwtAuthGuard)
-  async searchUsers(@Query('q') query: string) {
-    return this.usersService.searchUsers(query);
+  async searchUsers(
+    @Query('q') query: string,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.usersService.searchUsers(query, user.userId);
   }
 }

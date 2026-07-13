@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { TeamRole } from '@prisma/client';
+import { TeamMember, TeamRole } from '@prisma/client';
 
 @Injectable()
 export class PermissionsService {
@@ -22,30 +22,52 @@ export class PermissionsService {
       },
     });
 
-    if (!membership) {
-      return false;
-    }
+    return this.checkMembershipRoles(membership, requiredRoles);
+  }
 
-    if (!requiredRoles || requiredRoles.length == 0) {
-      return true;
-    }
+  async hasTeamAccess(
+    userId: number,
+    teamId: number,
+    requiredRoles?: TeamRole[],
+  ): Promise<boolean> {
+    const membership = await this.prismaService.teamMember.findUnique({
+      where: {
+        userId_teamId: {
+          userId: userId,
+          teamId: teamId,
+        },
+      },
+    });
 
-    return requiredRoles.includes(membership.role);
+    return this.checkMembershipRoles(membership, requiredRoles);
   }
 
   async validateProjectAccess(
     userId: number,
     projectId: number,
+    requiredRoles?: TeamRole[],
   ): Promise<void> {
-    const hasAccess = await this.hasProjectAccess(userId, projectId);
+    const hasAccess = await this.hasProjectAccess(
+      userId,
+      projectId,
+      requiredRoles,
+    );
     if (!hasAccess) {
-      throw new ForbiddenException(
-        'You do not have access to this project or you are not a member of the team.',
-      );
+      throw new ForbiddenException('You do not have access to this project.');
+    }
+  }
+  async validateTeamAccess(
+    userId: number,
+    teamId: number,
+    requiredRoles?: TeamRole[],
+  ): Promise<void> {
+    const hasAccess = await this.hasTeamAccess(userId, teamId, requiredRoles);
+    if (!hasAccess) {
+      throw new ForbiddenException('You are not a part of this team');
     }
   }
 
-  async canManageResources(
+  async canManageProjectResources(
     userId: number,
     projectId: number,
     resourceAuthorId: number,
@@ -57,5 +79,34 @@ export class PermissionsService {
     const isOwner = resourceAuthorId === userId;
 
     return isAdmin || isOwner;
+  }
+
+  async canManageTeamResources(
+    userId: number,
+    teamId: number,
+    resourceAuthorId: number,
+  ): Promise<boolean> {
+    const roles = TeamRole as Record<string, string>;
+    const isAdmin = await this.hasProjectAccess(userId, teamId, [
+      roles.ADMIN as TeamRole,
+    ]);
+    const isOwner = resourceAuthorId === userId;
+
+    return isAdmin || isOwner;
+  }
+
+  private checkMembershipRoles(
+    membership: TeamMember | null,
+    requiredRoles?: TeamRole[],
+  ): boolean {
+    if (!membership) {
+      return false;
+    }
+
+    if (!requiredRoles || requiredRoles.length == 0) {
+      return true;
+    }
+
+    return requiredRoles.includes(membership.role);
   }
 }

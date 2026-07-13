@@ -1,31 +1,61 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddMemberRequest } from './dto/add-member.request';
-import { TeamRole } from '@prisma/client';
+import { TeamMember, TeamRole } from '@prisma/client';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
 export class TeamMembersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly permissionsService: PermissionsService,
+  ) {}
 
-  async addMember(teamId: number, data: AddMemberRequest, curUserId: number) {
+  async addMember(
+    teamId: number,
+    data: AddMemberRequest,
+    curUserId: number,
+  ): Promise<TeamMember> {
+    const team = await this.prismaService.team.findUnique({
+      where: { id: teamId },
+    });
+
+    if (!team) {
+      throw new NotFoundException('Team not found.');
+    }
+
+    const canAdd = await this.permissionsService.canManageTeamResources(
+      curUserId,
+      teamId,
+      team.ownerId,
+    );
+
+    if (!canAdd) {
+      throw new ForbiddenException(
+        'Only the team owner or an administrator can add new members to this workspace.',
+      );
+    }
+
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        email: data.email,
+        isActive: true,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
     try {
-      const user = await this.prismaService.user.findUnique({
-        where: {
-          email: data.email,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (!user) {
-        throw new NotFoundException('User not found!');
-      }
-
       return this.prismaService.teamMember.create({
         data: {
           userId: user.id,
@@ -44,7 +74,9 @@ export class TeamMembersService {
     }
   }
 
-  async getMembers(teamId: number) {
+  async getMembers(teamId: number, curUserId: number) {
+    await this.permissionsService.validateTeamAccess(curUserId, teamId);
+
     return this.prismaService.teamMember.findMany({
       where: {
         teamId,
@@ -65,35 +97,56 @@ export class TeamMembersService {
     });
   }
 
-  async removeMember(teamId: number, memberId: number) {
+  async removeMember(
+    teamId: number,
+    removeUserId: number,
+    curUserId: number,
+  ): Promise<TeamMember> {
+    const memberToDelete = await this.prismaService.teamMember.findUnique({
+      where: {
+        userId_teamId: { teamId, userId: removeUserId },
+      },
+      include: { team: true },
+    });
+
+    if (!memberToDelete || memberToDelete.teamId !== teamId) {
+      throw new NotFoundException('Member not found in this team.');
+    }
+
+    if (memberToDelete.userId === memberToDelete.team.ownerId) {
+      throw new BadRequestException(
+        'Impossible to remove the team owner from their own team!',
+      );
+    }
+
+    const canRemove = await this.permissionsService.canManageTeamResources(
+      curUserId,
+      teamId,
+      memberToDelete.team.ownerId,
+    );
+
+    if (!canRemove) {
+      throw new ForbiddenException(
+        'Only the team owner or an administrator can remove members from this team.',
+      );
+    }
+
     return this.prismaService.$transaction(async (tx) => {
-      const memberToDelete = await tx.teamMember.findUnique({
-        where: {
-          userId_teamId: { teamId, userId: memberId },
-        },
-      });
-
-      if (!memberToDelete) {
-        throw new NotFoundException('Member not found in this team.');
-      }
-
-      const deletedMember = await tx.teamMember.delete({
-        where: { id: memberToDelete.id },
-      });
-
       if (memberToDelete.role === TeamRole.ADMIN) {
-        const remainingAdmins = await tx.teamMember.count({
+        const totalAdmins = await tx.teamMember.count({
           where: { teamId, role: TeamRole.ADMIN },
         });
 
-        if (remainingAdmins === 0) {
+        if (totalAdmins <= 1) {
           throw new BadRequestException(
             'Impossible to delete the last admin! Promote another team member first.',
           );
         }
       }
 
-      return deletedMember;
+      return tx.teamMember.delete({
+        where: { id: memberToDelete.id },
+      });
     });
   }
 }

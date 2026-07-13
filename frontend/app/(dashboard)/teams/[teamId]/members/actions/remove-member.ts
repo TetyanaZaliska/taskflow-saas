@@ -6,11 +6,11 @@ import { remove } from "@/app/common/util/fetch";
 import { getRouteName } from "@/app/common/util/get-route-name";
 import { revalidatePath } from "next/cache";
 
-export default async function removeMember(teamId: number, memberId: number) {
+export default async function removeMember(teamId: number, userId: number) {
   let response;
   try {
     response = await remove(
-      `${getRouteName(routes.app.teamMembers(teamId))}/${memberId}`,
+      `${getRouteName(routes.app.teamMembers(teamId))}/${userId}`,
     );
     revalidatePath(getRouteName(routes.app.teamMembers(teamId)));
   } catch (error) {

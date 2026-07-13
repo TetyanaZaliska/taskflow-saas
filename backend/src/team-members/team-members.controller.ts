@@ -14,8 +14,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
 import { AddMemberRequest } from './dto/add-member.request';
 import { TeamRolesGuard } from '../guards/team-roles.guard';
-import { TeamRole } from '@prisma/client';
-import { TeamRoles } from '../teams/team-roles.decorator';
+import { TeamMember } from '@prisma/client';
 
 @Controller('teams/:teamId/members')
 export class TeamMembersController {
@@ -23,28 +22,30 @@ export class TeamMembersController {
 
   @Post()
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
-  @TeamRoles(TeamRole.ADMIN)
   async addMember(
     @Param('teamId', ParseIntPipe) teamId: number,
     @Body() body: AddMemberRequest,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<TeamMember> {
     return this.teamMemberService.addMember(teamId, body, user.userId);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
-  async getMembers(@Param('teamId', ParseIntPipe) teamId: number) {
-    return this.teamMemberService.getMembers(teamId);
+  async getMembers(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.teamMemberService.getMembers(teamId, user.userId);
   }
 
-  @Delete(':memberId')
+  @Delete(':userId')
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
-  @TeamRoles(TeamRole.ADMIN)
   async removeMember(
     @Param('teamId', ParseIntPipe) teamId: number,
-    @Param('memberId', ParseIntPipe) memberId: number,
-  ) {
-    return this.teamMemberService.removeMember(teamId, memberId);
+    @Param('userId', ParseIntPipe) userId: number,
+    @CurrentUser() user: TokenPayload,
+  ): Promise<TeamMember> {
+    return this.teamMemberService.removeMember(teamId, userId, user.userId);
   }
 }

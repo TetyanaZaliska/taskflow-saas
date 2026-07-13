@@ -10,8 +10,6 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { TeamRolesGuard } from '../guards/team-roles.guard';
-import { TeamRoles } from '../teams/team-roles.decorator';
-import { TeamRole } from '@prisma/client';
 import { CreateProjectRequest } from './dto/create-project.request';
 import { ProjectsService } from './projects.service';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -23,27 +21,30 @@ export class ProjectsController {
 
   @Post()
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
-  @TeamRoles(TeamRole.ADMIN)
   async createProject(
     @Param('teamId', ParseIntPipe) teamId: number,
     @Body() body: CreateProjectRequest,
+    @CurrentUser() user: TokenPayload,
   ) {
-    return this.projectsService.createProject(teamId, body);
+    return this.projectsService.createProject(teamId, body, user.userId);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
-  async getProjects(@Param('teamId', ParseIntPipe) teamId: number) {
-    return this.projectsService.getProjects(teamId);
+  async getProjects(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.projectsService.getProjects(teamId, user.userId);
   }
 
   @Delete(':projectId')
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
-  @TeamRoles(TeamRole.ADMIN)
   async removeProject(
     @Param('teamId', ParseIntPipe) teamId: number,
     @Param('projectId', ParseIntPipe) projectId: number,
+    @CurrentUser() user: TokenPayload,
   ) {
-    return this.projectsService.removeProject(teamId, projectId);
+    return this.projectsService.removeProject(teamId, projectId, user.userId);
   }
 }

@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { TeamMembersController } from './team-members.controller';
 import { TeamMembersService } from './team-members.service';
 import { PrismaModule } from '../prisma/prisma.module';
+import { PermissionsModule } from '../permissions/permissions.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, PermissionsModule],
   controllers: [TeamMembersController],
   providers: [TeamMembersService],
 })

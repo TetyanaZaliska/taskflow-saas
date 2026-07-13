@@ -91,7 +91,7 @@ export class TasksService {
       throw new NotFoundException('Task not found');
     }
 
-    const canRemove = await this.permissionsService.canManageResources(
+    const canRemove = await this.permissionsService.canManageProjectResources(
       userId,
       task.projectId,
       task.authorId,
