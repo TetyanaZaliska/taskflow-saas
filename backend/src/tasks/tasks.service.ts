@@ -6,13 +6,18 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskRequest } from './dto/create-task.request';
-import { TeamRole } from '@prisma/client';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly permissionsService: PermissionsService,
+  ) {}
 
   async createTask(projectId: number, data: CreateTaskRequest, userId: number) {
+    await this.permissionsService.validateProjectAccess(userId, projectId);
+
     return this.prismaService.$transaction(async (tx) => {
       const project = await tx.project.findUnique({
         where: { id: projectId },
@@ -67,7 +72,9 @@ export class TasksService {
     });
   }
 
-  async getProjectTasks(projectId: number) {
+  async getProjectTasks(projectId: number, userId: number) {
+    await this.permissionsService.validateProjectAccess(userId, projectId);
+
     return this.prismaService.task.findMany({
       where: {
         projectId: projectId,
@@ -78,32 +85,21 @@ export class TasksService {
   async removeTask(taskId: number, userId: number) {
     const task = await this.prismaService.task.findUnique({
       where: { id: taskId },
-      include: {
-        project: true,
-      },
     });
 
     if (!task) {
       throw new NotFoundException('Task not found');
     }
 
-    const membership = await this.prismaService.teamMember.findFirst({
-      where: {
-        userId: userId,
-        teamId: task.project.teamId,
-      },
-    });
+    const canRemove = await this.permissionsService.canManageResources(
+      userId,
+      task.projectId,
+      task.authorId,
+    );
 
-    if (!membership) {
-      throw new ForbiddenException('You do not have access to this team');
-    }
-
-    const isOwner = task.authorId === userId;
-    const isAdmin = membership.role === TeamRole.ADMIN;
-
-    if (!isAdmin && !isOwner) {
+    if (!canRemove) {
       throw new ForbiddenException(
-        'You are not allowed to delete this task. Only the author or a team admin can do this.',
+        'You are not allowed to delete this task. Only the author or a team admins can do this.',
       );
     }
 

@@ -17,7 +17,10 @@ export class ProjectController {
 
   @Get(':projectId')
   @UseGuards(JwtAuthGuard, ProjectRolesGuard)
-  async getProject(@Param('projectId', ParseIntPipe) projectId: number) {
-    return this.projectService.getProject(projectId);
+  async getProject(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.projectService.getProject(projectId, user.userId);
   }
 }
