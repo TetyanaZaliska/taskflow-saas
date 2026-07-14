@@ -57,14 +57,10 @@ export class TasksService {
 
       const newTask = await tx.task.create({
         data: {
-          title: data.title,
-          description: data.description,
+          ...data,
           keyNumber: currentTaskKey,
           projectId: projectId,
           authorId: userId,
-          assigneeId: data.assigneeId,
-          status: data.status,
-          priority: data.priority,
         },
       });
 

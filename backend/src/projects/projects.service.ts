@@ -24,8 +24,9 @@ export class ProjectsService {
 
     return await this.prismaService.project.create({
       data: {
-        name: data.name,
-        description: data.description,
+        //name: data.name,
+        //description: data.description,
+        ...data,
         teamId: teamId,
         authorId: userId,
       },
