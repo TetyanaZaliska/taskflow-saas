@@ -66,6 +66,12 @@ export class TeamsService {
       throw new NotFoundException('Team not found.');
     }
 
+    if (teamToDelete.ownerId !== userId) {
+      throw new ForbiddenException(
+        'Only the primary team owner (creator) can delete this team.',
+      );
+    }
+
     const canRemove = await this.permissionsService.canManageTeamResources(
       userId,
       teamId,

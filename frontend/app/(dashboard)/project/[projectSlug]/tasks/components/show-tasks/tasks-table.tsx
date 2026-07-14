@@ -20,14 +20,14 @@ export default async function TasksTable({ projectId }: TasksTableProps) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-muted-foreground">Priority</TableHead>
-          <TableHead className="text-muted-foreground">Title</TableHead>
-          <TableHead className="text-right text-muted-foreground">
+          <TableHead className="text-muted-foreground w-[30px]"></TableHead>
+          <TableHead className="text-right text-muted-foreground w-[50px]">
+            Task
+          </TableHead>
+          <TableHead className="text-right text-muted-foreground w-[50px]">
             Status
           </TableHead>
-          <TableHead className="text-right text-muted-foreground">
-            Author
-          </TableHead>
+          <TableHead className="text-muted-foreground">Title</TableHead>
           <TableHead className="text-right text-muted-foreground">
             Date
           </TableHead>

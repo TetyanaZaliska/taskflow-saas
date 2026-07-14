@@ -50,7 +50,7 @@ export class TeamMembersService {
 
     if (!canAdd) {
       throw new ForbiddenException(
-        'Only the team owner or an administrator can add new members to this workspace.',
+        'Only the team owner or an administrator can add new members to this team.',
       );
     }
 
