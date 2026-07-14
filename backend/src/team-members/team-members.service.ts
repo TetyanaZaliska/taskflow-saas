@@ -8,6 +8,19 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AddMemberRequest } from './dto/add-member.request';
 import { TeamMember, TeamRole } from '@prisma/client';
 import { PermissionsService } from '../permissions/permissions.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+
+export interface MemberWithUserResponse {
+  id: number;
+  teamId: number;
+  userId: number;
+  role: TeamRole;
+  user: {
+    id: number;
+    email: string;
+    isActive: boolean;
+  };
+}
 
 @Injectable()
 export class TeamMembersService {
@@ -64,17 +77,22 @@ export class TeamMembersService {
         },
       });
     } catch (error) {
-      if (error?.code === 'P2002') {
-        throw new BadRequestException(
-          'This user is already a member of the team.',
-        );
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error?.code === 'P2002') {
+          throw new BadRequestException(
+            'This user is already a member of the team.',
+          );
+        }
       }
 
       throw error;
     }
   }
 
-  async getMembers(teamId: number, curUserId: number) {
+  async getMembers(
+    teamId: number,
+    curUserId: number,
+  ): Promise<MemberWithUserResponse[]> {
     await this.permissionsService.validateTeamAccess(curUserId, teamId);
 
     return this.prismaService.teamMember.findMany({

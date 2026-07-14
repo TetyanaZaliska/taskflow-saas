@@ -27,8 +27,10 @@ export class UsersService {
         },
       });
     } catch (err) {
-      if (err.code === 'P2002') {
-        throw new UnprocessableEntityException('Email already exists.');
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          throw new UnprocessableEntityException('Email already exists.');
+        }
       }
       throw err;
     }

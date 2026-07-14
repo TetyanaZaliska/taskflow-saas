@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectRequest } from './dto/create-project.request';
 import { PermissionsService } from '../permissions/permissions.service';
+import { Project } from '@prisma/client';
 
 @Injectable()
 export class ProjectsService {
@@ -18,7 +19,7 @@ export class ProjectsService {
     teamId: number,
     data: CreateProjectRequest,
     userId: number,
-  ) {
+  ): Promise<Project> {
     await this.permissionsService.validateTeamAccess(userId, teamId);
 
     return await this.prismaService.project.create({
@@ -31,7 +32,7 @@ export class ProjectsService {
     });
   }
 
-  async getProjects(teamId: number, userId: number) {
+  async getProjects(teamId: number, userId: number): Promise<Project[]> {
     await this.permissionsService.validateTeamAccess(userId, teamId);
 
     return this.prismaService.project.findMany({
@@ -44,7 +45,11 @@ export class ProjectsService {
     });
   }
 
-  async removeProject(teamId: number, projectId: number, userId: number) {
+  async removeProject(
+    teamId: number,
+    projectId: number,
+    userId: number,
+  ): Promise<Project> {
     const projectToRemove = await this.prismaService.project.findUnique({
       where: { id: projectId },
     });

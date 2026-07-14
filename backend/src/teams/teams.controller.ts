@@ -14,6 +14,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
 import { TeamsService } from './teams.service';
 import { TeamRolesGuard } from '../guards/team-roles.guard';
+import { Team } from '@prisma/client';
 
 @Controller('teams')
 export class TeamsController {
@@ -24,13 +25,13 @@ export class TeamsController {
   async createTeam(
     @Body() body: CreateTeamRequest,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<Team> {
     return this.teamsService.createTeam(body, user.userId);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getTeams(@CurrentUser() user: TokenPayload) {
+  async getTeams(@CurrentUser() user: TokenPayload): Promise<Team[]> {
     return this.teamsService.getTeams(user.userId);
   }
 
@@ -39,7 +40,7 @@ export class TeamsController {
   async getTeam(
     @Param('teamId', ParseIntPipe) teamId: number,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<Team> {
     return this.teamsService.getTeam(teamId, user.userId);
   }
 
@@ -48,7 +49,7 @@ export class TeamsController {
   async removeTeam(
     @Param('teamId', ParseIntPipe) teamId: number,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<Team> {
     return this.teamsService.removeTeam(teamId, user.userId);
   }
 }

@@ -8,7 +8,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { TeamMembersService } from './team-members.service';
+import {
+  MemberWithUserResponse,
+  TeamMembersService,
+} from './team-members.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
@@ -35,7 +38,7 @@ export class TeamMembersController {
   async getMembers(
     @Param('teamId', ParseIntPipe) teamId: number,
     @CurrentUser() user: TokenPayload,
-  ) {
+  ): Promise<MemberWithUserResponse[]> {
     return this.teamMemberService.getMembers(teamId, user.userId);
   }
 

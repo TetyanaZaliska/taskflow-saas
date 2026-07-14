@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateTeamRequest } from './dto/create-team.request';
 import { PrismaService } from '../prisma/prisma.service';
-import { TeamRole } from '@prisma/client';
+import { Team, TeamRole } from '@prisma/client';
 import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
@@ -15,10 +15,11 @@ export class TeamsService {
     private readonly permissionsService: PermissionsService,
   ) {}
 
-  async createTeam(data: CreateTeamRequest, userId: number) {
+  async createTeam(data: CreateTeamRequest, userId: number): Promise<Team> {
     return await this.prismaService.team.create({
       data: {
-        name: data.name,
+        //name: data.name,
+        ...data,
         ownerId: userId,
         members: {
           create: {
@@ -30,8 +31,8 @@ export class TeamsService {
     });
   }
 
-  async getTeams(userId: number) {
-    return this.prismaService.team.findMany({
+  async getTeams(userId: number): Promise<Team[]> {
+    return await this.prismaService.team.findMany({
       where: {
         members: {
           some: {
@@ -42,7 +43,7 @@ export class TeamsService {
     });
   }
 
-  async getTeam(teamId: number, userId: number) {
+  async getTeam(teamId: number, userId: number): Promise<Team> {
     await this.permissionsService.validateTeamAccess(userId, teamId);
 
     const team = await this.prismaService.team.findUnique({
@@ -56,7 +57,7 @@ export class TeamsService {
     return team;
   }
 
-  async removeTeam(teamId: number, userId: number) {
+  async removeTeam(teamId: number, userId: number): Promise<Team> {
     const teamToDelete = await this.prismaService.team.findUnique({
       where: { id: teamId },
     });
