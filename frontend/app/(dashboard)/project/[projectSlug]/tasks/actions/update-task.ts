@@ -14,7 +14,7 @@ export default async function updateTask(
   let response;
   try {
     response = await update(
-      `${getRouteName(routes.app.projectTasks(projectId))}/${taskId}/status`,
+      `${getRouteName(routes.app.projectTasks(projectId))}/${taskId}`,
       formData,
     );
     revalidatePath(getRouteName(routes.app.projectTasks(projectId)));
