@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { ProjectRolesGuard } from '../guards/project-roles.guard';
 import { CreateTaskRequest } from './dto/create-task.request';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
+import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 
 @Controller('project/:projectId/tasks')
 export class TasksController {
@@ -39,11 +41,28 @@ export class TasksController {
   }
 
   @Delete(':taskId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ProjectRolesGuard)
   async removeTask(
+    @Param('projectId', ParseIntPipe) projectId: number,
     @Param('taskId', ParseIntPipe) taskId: number,
     @CurrentUser() user: TokenPayload,
   ) {
-    return this.tasksService.removeTask(taskId, user.userId);
+    return this.tasksService.removeTask(projectId, taskId, user.userId);
+  }
+
+  @Patch(':taskId/status')
+  @UseGuards(JwtAuthGuard, ProjectRolesGuard)
+  async updateTaskStatus(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @Body() body: UpdateTaskStatusDto,
+    @CurrentUser() user: TokenPayload,
+  ) {
+    return this.tasksService.updateTaskFields(
+      projectId,
+      taskId,
+      body,
+      user.userId,
+    );
   }
 }

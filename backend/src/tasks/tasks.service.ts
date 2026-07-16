@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskRequest } from './dto/create-task.request';
 import { PermissionsService } from '../permissions/permissions.service';
 import { Task } from '@prisma/client';
+import { UpdateTaskFieldsDto } from './dto/update-task-fields.dto';
 
 @Injectable()
 export class TasksService {
@@ -83,7 +84,11 @@ export class TasksService {
     });
   }
 
-  async removeTask(taskId: number, userId: number): Promise<Task> {
+  async removeTask(
+    projectId: number,
+    taskId: number,
+    userId: number,
+  ): Promise<Task> {
     const task = await this.prismaService.task.findUnique({
       where: { id: taskId },
     });
@@ -94,7 +99,7 @@ export class TasksService {
 
     const canRemove = await this.permissionsService.canManageProjectResources(
       userId,
-      task.projectId,
+      projectId,
       task.authorId,
     );
 
@@ -107,5 +112,28 @@ export class TasksService {
     return this.prismaService.task.delete({
       where: { id: taskId },
     });
+  }
+
+  async updateTaskFields(
+    projectId: number,
+    taskId: number,
+    data: UpdateTaskFieldsDto,
+    userId: number,
+  ): Promise<Task> {
+    await this.permissionsService.validateProjectAccess(userId, projectId);
+
+    try {
+      return await this.prismaService.task.update({
+        where: {
+          id: taskId,
+          projectId: projectId,
+        },
+        data,
+      });
+    } catch {
+      throw new NotFoundException(
+        `Task with id ${taskId} not found in this project.`,
+      );
+    }
   }
 }
