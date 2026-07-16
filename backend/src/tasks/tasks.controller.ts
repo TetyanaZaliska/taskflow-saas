@@ -15,7 +15,7 @@ import { ProjectRolesGuard } from '../guards/project-roles.guard';
 import { CreateTaskRequest } from './dto/create-task.request';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
-import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
+import { UpdateTaskFieldsDto } from './dto/update-task-fields.dto';
 
 @Controller('project/:projectId/tasks')
 export class TasksController {
@@ -50,12 +50,12 @@ export class TasksController {
     return this.tasksService.removeTask(projectId, taskId, user.userId);
   }
 
-  @Patch(':taskId/status')
+  @Patch(':taskId')
   @UseGuards(JwtAuthGuard, ProjectRolesGuard)
-  async updateTaskStatus(
+  async updateTaskFields(
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('taskId', ParseIntPipe) taskId: number,
-    @Body() body: UpdateTaskStatusDto,
+    @Body() body: UpdateTaskFieldsDto,
     @CurrentUser() user: TokenPayload,
   ) {
     return this.tasksService.updateTaskFields(
