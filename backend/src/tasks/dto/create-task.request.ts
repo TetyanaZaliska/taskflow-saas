@@ -1,6 +1,6 @@
 import { TaskPriority, TaskStatus } from '@prisma/client';
-import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Length } from 'class-validator';
+import { ToOptionalInt } from '../../decorators/to-optional-int.decorator';
 
 export class CreateTaskRequest {
   @IsString()
@@ -11,21 +11,15 @@ export class CreateTaskRequest {
   @IsOptional()
   description?: string;
 
-  @IsEnum(TaskStatus as Record<string, string>)
+  @IsEnum(TaskStatus)
   @IsOptional()
   status?: TaskStatus;
 
-  @IsEnum(TaskPriority as Record<string, string>)
+  @IsEnum(TaskPriority)
   @IsOptional()
   priority?: TaskPriority;
 
-  @Transform(({ value }: { value: unknown }) => {
-    if (value === '' || value === null || value === 'null') return undefined;
-
-    const stringValue = value as string;
-    const parsed = parseInt(stringValue, 10);
-    return isNaN(parsed) ? stringValue : parsed;
-  })
+  @ToOptionalInt()
   @IsInt()
   @IsOptional()
   assigneeId?: number;
