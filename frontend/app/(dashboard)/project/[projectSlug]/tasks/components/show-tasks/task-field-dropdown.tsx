@@ -21,6 +21,7 @@ interface TaskFieldDropdownProps {
   fieldName: "status" | "priority";
   onUpdate: (formData: FormData) => Promise<void>;
   defaultIcon: LucideIcon;
+  showLabel?: boolean;
 }
 
 export function TaskFieldDropdown({
@@ -29,6 +30,7 @@ export function TaskFieldDropdown({
   fieldName,
   onUpdate,
   defaultIcon: DefaultIcon,
+  showLabel = false,
 }: TaskFieldDropdownProps) {
   const currentItem = options.find((opt) => opt.value === currentValue);
   const TriggerIcon = currentItem?.icon || DefaultIcon;
@@ -42,6 +44,15 @@ export function TaskFieldDropdown({
             currentItem?.color,
           )}
         />
+        <button className="flex items-center gap-2 rounded px-2 py-1 hover:bg-muted transition-colors focus:outline-none focus:ring-1 focus:ring-ring text-sm font-medium text-foreground">
+          <TriggerIcon
+            className={cn(
+              "h-4 w-4 text-muted-foreground cursor-pointer transition-transform active:scale-95",
+              currentItem?.color,
+            )}
+          />
+          {showLabel && <span>{currentItem?.label}</span>}
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="start">
         <DropdownMenuGroup>
