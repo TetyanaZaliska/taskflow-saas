@@ -98,6 +98,9 @@ export class TeamMembersService {
     return this.prismaService.teamMember.findMany({
       where: {
         teamId,
+        user: {
+          isActive: true,
+        },
       },
       select: {
         id: true,
