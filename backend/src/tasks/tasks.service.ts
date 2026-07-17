@@ -84,6 +84,27 @@ export class TasksService {
     });
   }
 
+  async getTask(
+    projectId: number,
+    taskId: number,
+    userId: number,
+  ): Promise<Task> {
+    await this.permissionsService.validateProjectAccess(userId, projectId);
+
+    try {
+      return await this.prismaService.task.findFirstOrThrow({
+        where: {
+          id: taskId,
+          projectId: projectId,
+        },
+      });
+    } catch {
+      throw new NotFoundException(
+        `Task with id ${taskId} not found in this project.`,
+      );
+    }
+  }
+
   async removeTask(
     projectId: number,
     taskId: number,
