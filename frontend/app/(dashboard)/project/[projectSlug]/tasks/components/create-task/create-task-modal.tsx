@@ -1,7 +1,5 @@
 "use client";
 
-import { FormResponse } from "@/app/common/interfaces/form-response.interface";
-import { AlertBox } from "@/components/custom/alert-box";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,15 +13,12 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useActionState, useEffect, useState } from "react";
 import { ButtonCreate } from "@/components/custom/button-create";
 import createTask from "../../actions/create-task";
 import { TaskSelect } from "./task-select";
 import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
 import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
-import getProject from "../../../actions/get-project";
-import { Project } from "../../../interfaces/project.interface";
 import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
 import getMembers from "@/app/(dashboard)/teams/[teamId]/members/actions/get-members";
 import { UserIcon } from "lucide-react";
@@ -74,9 +69,8 @@ export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
   useEffect(() => {
     if (modalVisible) {
       getMembers(teamId).then((data) => {
-        if (!data.error && Array.isArray(data)) {
-          const activeMembers = data.filter((m) => m.user.isActive);
-          setMembers(activeMembers);
+        if (Array.isArray(data)) {
+          setMembers(data);
         }
       });
     }
