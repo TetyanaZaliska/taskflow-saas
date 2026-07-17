@@ -33,7 +33,7 @@ export const post = async (path: string, formData: FormData) => {
   return { error: "" };
 };
 
-export const get = async (path: string, tags?: string[]) => {
+export const get = async <T>(path: string, tags?: string[]) => {
   const pathName = getRouteName(path);
 
   const res = await fetch(`${API_URL}/${pathName}`, {
@@ -48,7 +48,7 @@ export const get = async (path: string, tags?: string[]) => {
     return { error: getErrorMessage(parseRes) };
   }
 
-  return parseRes;
+  return parseRes as T;
 
   //return res.json() as T;
 };
