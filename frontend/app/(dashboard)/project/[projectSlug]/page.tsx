@@ -8,11 +8,11 @@ import { redirect } from "next/navigation";
 import { toSlug } from "@/app/common/util/to-slug";
 import { type Project } from "./interfaces/project.interface";
 
-interface SingleTeamProps {
+interface ProjectProps {
   params: Promise<{ projectSlug: string }>;
 }
 
-export default async function Project({ params }: SingleTeamProps) {
+export default async function Project({ params }: ProjectProps) {
   const projectSlug = (await params).projectSlug;
   const projectId = parseInt(projectSlug.split("-")[0], 10);
 
@@ -20,9 +20,9 @@ export default async function Project({ params }: SingleTeamProps) {
     redirect(routes.app.teams);
   }
 
-  const project: Project = await getProject(projectId);
+  const project = await getProject(projectId);
 
-  assertNoErrors(project, routes.app.teamProjects(project.teamId));
+  assertNoErrors(project, routes.app.teams);
 
   const taskLink = routes.app.projectTasks(
     `${project.id}-${toSlug(project.name)}`,
