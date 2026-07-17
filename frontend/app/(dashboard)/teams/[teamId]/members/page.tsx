@@ -1,5 +1,5 @@
 import { routes } from "@/app/common/constants/routes";
-import getTeam from "../get-team";
+import getTeam from "../actions/get-team";
 import MembersTable from "./componets/show-members/members-table";
 import { assertNoErrors } from "@/app/common/util/error-redirect";
 import { AddMemberModal } from "./componets/add-member/add-member-modal";

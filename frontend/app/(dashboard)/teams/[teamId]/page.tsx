@@ -1,5 +1,5 @@
 import Link from "next/link";
-import getTeam from "./get-team";
+import getTeam from "./actions/get-team";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/app/common/constants/routes";
 import { assertNoErrors } from "@/app/common/util/error-redirect";
