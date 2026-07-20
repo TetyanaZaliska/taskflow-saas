@@ -8,13 +8,18 @@ import {
 import getTasks from "../../actions/get-tasks";
 import { Task } from "../../interfaces/task.interface";
 import TaskRow from "./task-row";
+import { assertNoErrors } from "@/app/common/util/error-redirect";
+import { routes } from "@/app/common/constants/routes";
 
 interface TasksTableProps {
-  projectId: number;
+  projectSlug: string;
 }
 
-export default async function TasksTable({ projectId }: TasksTableProps) {
+export default async function TasksTable({ projectSlug }: TasksTableProps) {
+  const projectId = parseInt(projectSlug.split("-")[0], 10);
   const members = await getTasks(projectId);
+
+  assertNoErrors(members, routes.app.projectTasks(projectSlug));
 
   return (
     <Table>
@@ -35,7 +40,7 @@ export default async function TasksTable({ projectId }: TasksTableProps) {
       </TableHeader>
       <TableBody>
         {members.map((task: Task) => (
-          <TaskRow key={task.id} task={task} />
+          <TaskRow key={task.id} task={task} projectSlug={projectSlug} />
         ))}
       </TableBody>
     </Table>

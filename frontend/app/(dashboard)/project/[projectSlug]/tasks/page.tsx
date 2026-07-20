@@ -19,7 +19,7 @@ export default async function Tasks({ params }: TasksProps) {
 
   const project = await getProject(projectId);
 
-  assertNoErrors(project, routes.app.teamProjects(project.teamId));
+  assertNoErrors(project, routes.app.projectTasks(projectId));
 
   return (
     <>
@@ -27,7 +27,7 @@ export default async function Tasks({ params }: TasksProps) {
         {project.name}
       </h2>
       <CreateTaskModal projectId={projectId} teamId={project.teamId} />
-      <TasksTable projectId={projectId} />
+      <TasksTable projectSlug={projectSlug} />
     </>
   );
 }

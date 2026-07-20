@@ -12,12 +12,16 @@ import { formatDate } from "@/app/common/util/format-date";
 import updateTask from "../../actions/update-task";
 import { useActionNotify } from "@/hooks/use-activity-notify";
 import { TaskFieldDropdown } from "./task-field-dropdown";
+import { routes } from "@/app/common/constants/routes";
+import { toSlug } from "@/app/common/util/to-slug";
+import Link from "next/link";
 
 interface TaskRowProps {
   task: Task;
+  projectSlug: string;
 }
 
-export default function TaskRow({ task }: TaskRowProps) {
+export default function TaskRow({ task, projectSlug }: TaskRowProps) {
   const { handleResult } = useActionNotify();
 
   const handleRemoveTask = async () => {
@@ -31,6 +35,8 @@ export default function TaskRow({ task }: TaskRowProps) {
 
     handleResult(res);
   };
+
+  const taskLink = `${routes.app.projectTasks(projectSlug)}/${task.id}-${toSlug(task.title)}`;
 
   return (
     <TableRow
@@ -55,7 +61,9 @@ export default function TaskRow({ task }: TaskRowProps) {
           defaultIcon={AlertCircle}
         />
       </TableCell>
-      <TableCell className="font-medium">{task.title}</TableCell>
+      <TableCell className="font-medium">
+        <Link href={taskLink}>{task.title}</Link>
+      </TableCell>
       <TableCell className="text-right">{formatDate(task.createdAt)}</TableCell>
       <TableCell className="text-right">
         <ButtonDelete onClick={handleRemoveTask} />
