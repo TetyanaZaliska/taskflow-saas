@@ -18,7 +18,7 @@ interface DropdownOption {
 interface TaskFieldDropdownProps {
   currentValue: string;
   options: DropdownOption[];
-  fieldName: "status" | "priority";
+  fieldName: "status" | "priority" | "assigneeId";
   onUpdate: (formData: FormData) => Promise<void>;
   defaultIcon: LucideIcon;
   showLabel?: boolean;

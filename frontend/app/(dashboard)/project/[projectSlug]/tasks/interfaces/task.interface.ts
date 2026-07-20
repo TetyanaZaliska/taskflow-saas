@@ -1,5 +1,6 @@
 import { TASK_PRIORITY } from "@/app/common/constants/task-priority";
 import { TASK_STATUS } from "@/app/common/constants/task-status";
+import { Project } from "../../interfaces/project.interface";
 
 export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
 export type TaskPriority = (typeof TASK_PRIORITY)[keyof typeof TASK_PRIORITY];
@@ -16,4 +17,8 @@ export interface Task {
   authorId: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TaskWithProject extends Task {
+  project: Project;
 }
