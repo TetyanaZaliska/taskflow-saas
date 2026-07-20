@@ -7,8 +7,12 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskRequest } from './dto/create-task.request';
 import { PermissionsService } from '../permissions/permissions.service';
-import { Task } from '@prisma/client';
+import { Prisma, Task } from '@prisma/client';
 import { UpdateTaskFieldsDto } from './dto/update-task-fields.dto';
+
+export type TaskWithProject = Prisma.TaskGetPayload<{
+  include: { project: true };
+}>;
 
 @Injectable()
 export class TasksService {
@@ -88,7 +92,7 @@ export class TasksService {
     projectId: number,
     taskId: number,
     userId: number,
-  ): Promise<Task> {
+  ): Promise<TaskWithProject> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
     try {
@@ -96,6 +100,9 @@ export class TasksService {
         where: {
           id: taskId,
           projectId: projectId,
+        },
+        include: {
+          project: true,
         },
       });
     } catch {
