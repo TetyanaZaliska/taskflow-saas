@@ -38,12 +38,6 @@ export function TaskFieldDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <TriggerIcon
-          className={cn(
-            "h-4 w-4 text-muted-foreground cursor-pointer",
-            currentItem?.color,
-          )}
-        />
         <button className="flex items-center gap-2 rounded px-2 py-1 hover:bg-muted transition-colors focus:outline-none focus:ring-1 focus:ring-ring text-sm font-medium text-foreground">
           <TriggerIcon
             className={cn(
