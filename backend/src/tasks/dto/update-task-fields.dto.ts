@@ -23,5 +23,5 @@ export class UpdateTaskFieldsDto {
   @ToOptionalInt()
   @IsInt()
   @IsOptional()
-  assigneeId?: number;
+  assigneeId?: number | null;
 }

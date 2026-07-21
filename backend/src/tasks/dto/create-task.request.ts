@@ -22,5 +22,5 @@ export class CreateTaskRequest {
   @ToOptionalInt()
   @IsInt()
   @IsOptional()
-  assigneeId?: number;
+  assigneeId?: number | null;
 }

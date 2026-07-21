@@ -38,7 +38,7 @@ export function TaskDetails({ task }: TaskDetailsProps) {
   const mappedMembers = useMemo(() => {
     return [
       {
-        value: "",
+        value: "null",
         label: "No assignee",
         icon: UserIcon,
         color: "text-muted-foreground",
@@ -79,7 +79,7 @@ export function TaskDetails({ task }: TaskDetailsProps) {
           showLabel
         />
         <TaskFieldDropdown
-          currentValue={task.assigneeId.toString()}
+          currentValue={task.assigneeId?.toString() || "null"}
           options={mappedMembers}
           fieldName="assigneeId"
           onUpdate={handleUpdateFields}
