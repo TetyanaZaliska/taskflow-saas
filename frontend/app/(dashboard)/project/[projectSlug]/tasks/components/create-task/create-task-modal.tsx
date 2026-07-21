@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { ButtonCreate } from "@/components/custom/button-create";
 import createTask from "../../actions/create-task";
 import { TaskSelect } from "./task-select";
@@ -21,9 +21,9 @@ import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
 import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
 import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
 import getMembers from "@/app/(dashboard)/teams/[teamId]/members/actions/get-members";
-import { UserIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { FormError } from "@/components/custom/form-error";
+import { mapMembersToOptions } from "@/app/common/util/map-members";
 
 interface CreateTaskModalProps {
   projectId: number;
@@ -40,7 +40,7 @@ export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
   const resetFormToDefault = () => {
     setStatus(TASK_STATUS_LIST[0].value);
     setPriority(TASK_PRIORITY_LIST[0].value);
-    setAssigneeId("");
+    setAssigneeId("null");
   };
 
   const [state, formAction, isPending] = useActionState(
@@ -76,19 +76,9 @@ export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
     }
   }, [modalVisible, teamId]);
 
-  const mappedMembers = [
-    {
-      value: "",
-      label: "No assignee",
-      icon: UserIcon,
-      color: "text-muted-foreground",
-    },
-    ...members.map((member) => ({
-      value: String(member.user.id),
-      label: member.user.email,
-      icon: UserIcon,
-    })),
-  ];
+  const mappedMembers = useMemo(() => {
+    return mapMembersToOptions(members);
+  }, [members]);
 
   return (
     <Dialog open={modalVisible} onOpenChange={handleOpenChange}>

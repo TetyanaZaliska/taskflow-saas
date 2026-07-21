@@ -6,11 +6,12 @@ import { TaskWithProject } from "../../interfaces/task.interface";
 import { formatDate } from "@/app/common/util/format-date";
 import { TaskFieldDropdown } from "../../components/show-tasks/task-field-dropdown";
 import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
-import { AlertCircle, UserIcon } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
 import { AutoSaveTextarea } from "./auto-save-textarea";
 import { useMemo, useState } from "react";
 import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
+import { mapMembersToOptions } from "@/app/common/util/map-members";
 
 interface TaskDetailsProps {
   task: TaskWithProject;
@@ -27,19 +28,7 @@ export function TaskDetails({ task, initialMembers }: TaskDetailsProps) {
   };
 
   const mappedMembers = useMemo(() => {
-    return [
-      {
-        value: "null",
-        label: "No assignee",
-        icon: UserIcon,
-        color: "text-muted-foreground",
-      },
-      ...members.map((member) => ({
-        value: String(member.user.id),
-        label: member.user.email,
-        icon: UserIcon,
-      })),
-    ];
+    return mapMembersToOptions(members);
   }, [members]);
 
   return (
