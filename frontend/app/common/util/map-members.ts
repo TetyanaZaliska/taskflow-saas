@@ -1,17 +1,9 @@
 // src/app/common/util/map-members.ts
 import { UserIcon } from "lucide-react";
 import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
+import { SelectOption } from "../interfaces/select-option.interface";
 
-export interface DropdownOption {
-  value: string;
-  label: string;
-  icon: typeof UserIcon;
-  color?: string;
-}
-
-export function mapMembersToOptions(
-  members: MemberWithUser[],
-): DropdownOption[] {
+export function mapMembersToOptions(members: MemberWithUser[]): SelectOption[] {
   return [
     {
       value: "null",

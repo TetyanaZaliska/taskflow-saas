@@ -1,3 +1,4 @@
+import { SelectOption } from "@/app/common/interfaces/select-option.interface";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -13,18 +14,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
 import { useState } from "react";
 
-interface SelectItem {
-  value: string;
-  label: string;
-  icon: LucideIcon;
-  color?: string;
-}
-
 interface TaskSelectProps {
-  items: SelectItem[];
+  items: SelectOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;

@@ -1,3 +1,4 @@
+import { SelectOption } from "@/app/common/interfaces/select-option.interface";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,16 +9,9 @@ import {
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
-interface DropdownOption {
-  value: string;
-  label: string;
-  icon: LucideIcon;
-  color?: string;
-}
-
 interface TaskFieldDropdownProps {
   currentValue: string;
-  options: DropdownOption[];
+  options: SelectOption[];
   fieldName: "status" | "priority" | "assigneeId";
   onUpdate: (formData: FormData) => Promise<void>;
   defaultIcon: LucideIcon;

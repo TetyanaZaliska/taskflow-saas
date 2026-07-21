@@ -1,16 +1,5 @@
-import {
-  CheckCircle2,
-  Circle,
-  CircleCheck,
-  CircleDashed,
-  CircleDot,
-  CirclePercent,
-  ListTodo,
-  Square,
-  SquareCheck,
-  Timer,
-  TrendingUp,
-} from "lucide-react";
+import { Circle, CircleCheck, TrendingUp } from "lucide-react";
+import { SelectOption } from "../interfaces/select-option.interface";
 
 export const TASK_STATUS = {
   TODO: "TODO",
@@ -18,7 +7,7 @@ export const TASK_STATUS = {
   DONE: "DONE",
 } as const;
 
-export const TASK_STATUS_LIST = [
+export const TASK_STATUS_LIST: SelectOption[] = [
   {
     value: TASK_STATUS.TODO,
     label: "Todo",
