@@ -1,7 +1,5 @@
 "use client";
 
-import { FormResponse } from "@/app/common/interfaces/form-response.interface";
-import { AlertBox } from "@/components/custom/alert-box";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,27 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { CirclePlus, UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
-import { InputGroupAddon } from "@/components/ui/input-group";
-import { User } from "../../../members/interfaces/user.interface";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { useActionState, useState } from "react";
 import createProject from "../../actions/create-project";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ButtonCreate } from "@/components/custom/button-create";
 import { FormError } from "@/components/custom/form-error";
@@ -44,14 +25,17 @@ interface CreateProjectModalProps {
 
 export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [response, setResponse] = useState<FormResponse>();
 
-  const createProjectAction = createProject.bind(null, teamId);
-
-  const onClose = () => {
-    setResponse(undefined);
-    setModalVisible(false);
-  };
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: unknown, formData: FormData) => {
+      const response = await createProject(teamId, formData);
+      if (response && !response.error) {
+        setModalVisible(false);
+      }
+      return response;
+    },
+    { error: "" },
+  );
 
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
@@ -59,15 +43,7 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
         <ButtonCreate title="Create Project" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
-        <form
-          action={async (formData) => {
-            const response = await createProjectAction(formData);
-            setResponse(response);
-            if (!response.error) {
-              onClose();
-            }
-          }}
-        >
+        <form action={formAction}>
           <DialogHeader>
             <DialogTitle>Create a new project</DialogTitle>
             <DialogDescription>
@@ -83,6 +59,7 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
                 type="text"
                 placeholder="Some Project"
                 required
+                disabled={isPending}
               />
             </Field>
 
@@ -92,18 +69,21 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
                 placeholder="Type your description here..."
                 id="description"
                 name="description"
+                disabled={isPending}
               />
             </Field>
 
-            <FormError error={response?.error} />
+            <FormError error={state?.error} />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isPending}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Submitting..." : "Submit"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
