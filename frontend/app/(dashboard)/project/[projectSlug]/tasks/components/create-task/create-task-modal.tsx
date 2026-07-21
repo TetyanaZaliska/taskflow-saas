@@ -67,13 +67,20 @@ export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
   };
 
   useEffect(() => {
+    let isMounted = true;
     if (modalVisible) {
       getMembers(teamId).then((data) => {
+        if (!isMounted) return;
         if (Array.isArray(data)) {
           setMembers(data);
+        } else if (data && "error" in data) {
+          console.error("Failed to load members:", data.error);
         }
       });
     }
+    return () => {
+      isMounted = false;
+    };
   }, [modalVisible, teamId]);
 
   const mappedMembers = useMemo(() => {
