@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
 import { UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import {
   Combobox,
   ComboboxContent,
@@ -30,6 +30,7 @@ import addMember from "../../actions/add-member";
 import { searchUsers } from "../../actions/search-users";
 import { ButtonCreate } from "@/components/custom/button-create";
 import { FormError } from "@/components/custom/form-error";
+import { assertValidResponse } from "@/app/common/util/assert-valid-response";
 
 interface AddMemberModalProps {
   teamId: number;
@@ -37,15 +38,31 @@ interface AddMemberModalProps {
 
 export function AddMemberModal({ teamId }: AddMemberModalProps) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [response, setResponse] = useState<FormResponse>();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<User[]>([]);
 
-  const addMemberAction = addMember.bind(null, teamId);
+  const onClose = () => {
+    setSelectedUser(null);
+    setSearch("");
+    setUsers([]);
+    setModalVisible(false);
+  };
+
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: unknown, formData: FormData) => {
+      const response = await addMember(teamId, formData);
+      if (response && !response.error) {
+        onClose();
+      }
+      return response;
+    },
+    { error: "" },
+  );
 
   useEffect(() => {
+    let isCurrent = true;
     const timeout = setTimeout(async () => {
       if (search.length < 2) {
         setUsers([]);
@@ -55,22 +72,22 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
       try {
         const users = await searchUsers(search);
 
+        if (!isCurrent) return;
+
+        assertValidResponse(users);
+
         setUsers(users);
       } catch (error) {
         console.error(error);
+        if (isCurrent) setUsers([]);
       }
     }, 300);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      isCurrent = false;
+      clearTimeout(timeout);
+    };
   }, [search]);
-
-  const onClose = () => {
-    setResponse(undefined);
-    setSelectedUser(null);
-    setSearch("");
-    setUsers([]);
-    setModalVisible(false);
-  };
 
   return (
     <Dialog open={modalVisible} onOpenChange={setModalVisible}>
@@ -78,15 +95,7 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
         <ButtonCreate title="Add Member" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
-        <form
-          action={async (formData) => {
-            const response = await addMemberAction(formData);
-            setResponse(response);
-            if (!response.error) {
-              onClose();
-            }
-          }}
-        >
+        <form action={formAction}>
           <DialogHeader>
             <DialogTitle>Add a new team member</DialogTitle>
             <DialogDescription>Choose a new member</DialogDescription>
@@ -121,15 +130,17 @@ export function AddMemberModal({ teamId }: AddMemberModalProps) {
 
             <ChooseRole />
 
-            <FormError error={response?.error} />
+            <FormError error={state?.error} />
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isPending}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Submitting..." : "Submit"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
