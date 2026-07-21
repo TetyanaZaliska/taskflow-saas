@@ -9,31 +9,22 @@ import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
 import { AlertCircle, UserIcon } from "lucide-react";
 import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
 import { AutoSaveTextarea } from "./auto-save-textarea";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
-import getMembers from "@/app/(dashboard)/teams/[teamId]/members/actions/get-members";
 
 interface TaskDetailsProps {
   task: TaskWithProject;
+  initialMembers: MemberWithUser[];
 }
 
-export function TaskDetails({ task }: TaskDetailsProps) {
+export function TaskDetails({ task, initialMembers }: TaskDetailsProps) {
   const { handleResult } = useActionNotify();
-  const [members, setMembers] = useState<MemberWithUser[]>([]);
+  const [members] = useState<MemberWithUser[]>(initialMembers);
 
   const handleUpdateFields = async (formData: FormData) => {
     const res = await updateTask(task.projectId, task.id, formData);
-
     handleResult(res);
   };
-
-  useEffect(() => {
-    getMembers(task.project.teamId).then((data) => {
-      if (Array.isArray(data)) {
-        setMembers(data);
-      }
-    });
-  }, [task.project.teamId]);
 
   const mappedMembers = useMemo(() => {
     return [
