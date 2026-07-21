@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -69,7 +70,7 @@ export class TeamMembersService {
     }
 
     try {
-      return this.prismaService.teamMember.create({
+      return await this.prismaService.teamMember.create({
         data: {
           userId: user.id,
           teamId: teamId,
@@ -79,7 +80,7 @@ export class TeamMembersService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error?.code === 'P2002') {
-          throw new BadRequestException(
+          throw new ConflictException(
             'This user is already a member of the team.',
           );
         }
