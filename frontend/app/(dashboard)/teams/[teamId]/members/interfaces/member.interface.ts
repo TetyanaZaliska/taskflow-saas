@@ -11,6 +11,6 @@ export interface Member {
   createdAt: string;
 }
 
-export type MemberWithUser = Member & {
+export interface MemberWithUser extends Member {
   user: User;
-};
+}
