@@ -1,91 +1,34 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useMemo, useState } from "react";
 import { ButtonCreate } from "@/components/custom/button-create";
-import createTask from "../../actions/create-task";
-import { TaskSelect } from "./task-select";
-import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
-import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
 import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
-import getMembers from "@/app/(dashboard)/teams/[teamId]/members/actions/get-members";
-import { Textarea } from "@/components/ui/textarea";
-import { FormError } from "@/components/custom/form-error";
 import { mapMembersToOptions } from "@/app/common/util/map-members";
+import { CreateTaskForm } from "./create-task-form";
 
 interface CreateTaskModalProps {
   projectId: number;
-  teamId: number;
+  initialMembers: MemberWithUser[];
 }
 
-export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
+export function CreateTaskModal({
+  projectId,
+  initialMembers,
+}: CreateTaskModalProps) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [status, setStatus] = useState<string>(TASK_STATUS_LIST[0].value);
-  const [priority, setPriority] = useState<string>(TASK_PRIORITY_LIST[0].value);
-  const [members, setMembers] = useState<MemberWithUser[]>([]);
-  const [assigneeId, setAssigneeId] = useState<string>("");
-
-  const resetFormToDefault = () => {
-    setStatus(TASK_STATUS_LIST[0].value);
-    setPriority(TASK_PRIORITY_LIST[0].value);
-    setAssigneeId("null");
-  };
-
-  const [state, formAction, isPending] = useActionState(
-    async (prevState: unknown, formData: FormData) => {
-      formData.append("status", status);
-      formData.append("priority", priority);
-      formData.append("assigneeId", assigneeId);
-
-      const res = await createTask(projectId, formData);
-      if (!res.error) {
-        setModalVisible(false);
-        resetFormToDefault();
-      }
-      return res;
-    },
-    null,
-  );
+  const [formKey, setFormKey] = useState(0);
 
   const handleOpenChange = (visible: boolean) => {
     setModalVisible(visible);
     if (!visible) {
-      resetFormToDefault();
+      setFormKey((prev) => prev + 1);
     }
   };
 
-  useEffect(() => {
-    let isMounted = true;
-    if (modalVisible) {
-      getMembers(teamId).then((data) => {
-        if (!isMounted) return;
-        if (Array.isArray(data)) {
-          setMembers(data);
-        } else if (data && "error" in data) {
-          console.error("Failed to load members:", data.error);
-        }
-      });
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [modalVisible, teamId]);
-
   const mappedMembers = useMemo(() => {
-    return mapMembersToOptions(members);
-  }, [members]);
+    return mapMembersToOptions(initialMembers);
+  }, [initialMembers]);
 
   return (
     <Dialog open={modalVisible} onOpenChange={handleOpenChange}>
@@ -93,77 +36,12 @@ export function CreateTaskModal({ projectId, teamId }: CreateTaskModalProps) {
         <ButtonCreate title="Create Task" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
-        <form action={formAction}>
-          <DialogHeader>
-            <DialogTitle>Create new task</DialogTitle>
-            <DialogDescription>
-              Fill the data to create a new task for your team.
-            </DialogDescription>
-          </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <FieldLabel>Title</FieldLabel>
-              <Input
-                id="title"
-                name="title"
-                type="text"
-                placeholder="Task title"
-                required
-              />
-            </Field>
-
-            <Field>
-              <FieldLabel>Description</FieldLabel>
-              <Textarea
-                placeholder="Type your description here..."
-                id="description"
-                name="description"
-              />
-            </Field>
-
-            <div className="flex flex-col gap-1.5">
-              <TaskSelect
-                items={mappedMembers}
-                value={assigneeId}
-                onChange={setAssigneeId}
-                placeholder="Search team member..."
-                className="w-full"
-              />
-            </div>
-
-            <div className="flex items-center gap-4 mb-4">
-              <TaskSelect
-                items={TASK_STATUS_LIST}
-                value={status}
-                onChange={setStatus}
-                placeholder="Change status to..."
-                className="w-[168px]"
-              />
-              <TaskSelect
-                items={TASK_PRIORITY_LIST}
-                value={priority}
-                onChange={setPriority}
-                placeholder="Change priority to..."
-                className="w-[168px]"
-              />
-            </div>
-            <FormError error={state?.error} />
-          </FieldGroup>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={resetFormToDefault}
-              >
-                Cancel
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Submitting..." : "Submit"}
-            </Button>
-          </DialogFooter>
-        </form>
+        <CreateTaskForm
+          key={formKey}
+          projectId={projectId}
+          mappedMembers={mappedMembers}
+          onSuccess={() => handleOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );
