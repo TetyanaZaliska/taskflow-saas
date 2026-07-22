@@ -6,11 +6,8 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useState } from "react";
 
 export function ChooseRole() {
-  const [teamRole, setTeamRole] = useState<string | null>(null);
-
   return (
     <RadioGroup
       name="role"

@@ -8,6 +8,7 @@ import {
 import getMembers from "../../actions/get-members";
 import MemberRow from "./member-row";
 import { MemberWithUser } from "../../interfaces/member.interface";
+import { FormError } from "@/components/custom/form-error";
 
 interface MembersTableProps {
   teamId: number;
@@ -15,6 +16,10 @@ interface MembersTableProps {
 
 export default async function MembersTable({ teamId }: MembersTableProps) {
   const members = await getMembers(teamId);
+
+  if (members && "error" in members) {
+    return <FormError error={members.error} />;
+  }
 
   return (
     <Table>

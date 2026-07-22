@@ -1,7 +1,6 @@
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -9,9 +8,14 @@ import {
 import getTeams from "../../actions/get-teams";
 import TeamRow from "./team-row";
 import { Team } from "../../interfaces/team.interface";
+import { FormError } from "@/components/custom/form-error";
 
 export default async function TeamsTable() {
   const teams = await getTeams();
+
+  if (teams && "error" in teams) {
+    return <FormError error={teams.error} />;
+  }
 
   return (
     <Table>

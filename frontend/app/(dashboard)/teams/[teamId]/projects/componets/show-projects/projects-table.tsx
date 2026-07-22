@@ -8,6 +8,7 @@ import {
 import getProjects from "../../actions/get-projects";
 import ProjectRow from "./project-row";
 import { Project } from "../../interfaces/project.interface";
+import { FormError } from "@/components/custom/form-error";
 
 interface ProjectsTableProps {
   teamId: number;
@@ -15,6 +16,10 @@ interface ProjectsTableProps {
 
 export default async function ProjectsTable({ teamId }: ProjectsTableProps) {
   const projects = await getProjects(teamId);
+
+  if (projects && "error" in projects) {
+    return <FormError error={projects.error} />;
+  }
 
   return (
     <Table>

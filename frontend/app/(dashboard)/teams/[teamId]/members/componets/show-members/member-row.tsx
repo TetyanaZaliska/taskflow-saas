@@ -3,9 +3,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Member, MemberWithUser } from "../../interfaces/member.interface";
-import { Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MemberWithUser } from "../../interfaces/member.interface";
 import { routes } from "@/app/common/constants/routes";
 import removeMember from "../../actions/remove-member";
 import { toast } from "sonner";
@@ -16,10 +14,10 @@ interface MemberRowProps {
 }
 
 export default function MemberRow({ member }: MemberRowProps) {
-  const router = useRouter();
+  // const router = useRouter();
 
-  const handleRouteUser = () =>
-    router.push(`${routes.app.teamMembers(member.teamId)}/${member.user.id}`);
+  // const handleRouteUser = () =>
+  //   router.push(`${routes.app.teamMembers(member.teamId)}/${member.user.id}`);
 
   const handleRemoveMember = async () => {
     const res = await removeMember(member.teamId, member.user.id);
