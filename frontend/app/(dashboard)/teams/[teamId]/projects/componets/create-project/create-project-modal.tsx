@@ -43,49 +43,51 @@ export function CreateProjectModal({ teamId }: CreateProjectModalProps) {
         <ButtonCreate title="Create Project" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
-        <form action={formAction}>
-          <DialogHeader>
-            <DialogTitle>Create a new project</DialogTitle>
-            <DialogDescription>
-              Choose name for your new project and input description.
-            </DialogDescription>
-          </DialogHeader>
-          <FieldGroup className="mb-5">
-            <Field>
-              <FieldLabel htmlFor="name">Name</FieldLabel>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Some Project"
-                required
-                disabled={isPending}
-              />
-            </Field>
+        {modalVisible && (
+          <form action={formAction}>
+            <DialogHeader>
+              <DialogTitle>Create a new project</DialogTitle>
+              <DialogDescription>
+                Choose name for your new project and input description.
+              </DialogDescription>
+            </DialogHeader>
+            <FieldGroup className="mb-5">
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Some Project"
+                  required
+                  disabled={isPending}
+                />
+              </Field>
 
-            <Field>
-              <FieldLabel htmlFor="description">Description</FieldLabel>
-              <Textarea
-                placeholder="Type your description here..."
-                id="description"
-                name="description"
-                disabled={isPending}
-              />
-            </Field>
+              <Field>
+                <FieldLabel htmlFor="description">Description</FieldLabel>
+                <Textarea
+                  placeholder="Type your description here..."
+                  id="description"
+                  name="description"
+                  disabled={isPending}
+                />
+              </Field>
 
-            <FormError error={state?.error} />
-          </FieldGroup>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isPending}>
-                Cancel
+              <FormError error={state?.error} />
+            </FieldGroup>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline" disabled={isPending}>
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Submitting..." : "Submit"}
               </Button>
-            </DialogClose>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Submitting..." : "Submit"}
-            </Button>
-          </DialogFooter>
-        </form>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
