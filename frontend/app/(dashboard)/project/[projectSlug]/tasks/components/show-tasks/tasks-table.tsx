@@ -16,10 +16,10 @@ interface TasksTableProps {
 
 export default async function TasksTable({ projectSlug }: TasksTableProps) {
   const projectId = parseInt(projectSlug.split("-")[0], 10);
-  const members = await getTasks(projectId);
+  const tasks = await getTasks(projectId);
 
-  if (members && "error" in members) {
-    return <FormError error={members.error} />;
+  if (tasks && "error" in tasks) {
+    return <FormError error={tasks.error} />;
   }
 
   return (
@@ -40,7 +40,7 @@ export default async function TasksTable({ projectSlug }: TasksTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {members.map((task: Task) => (
+        {tasks.map((task: Task) => (
           <TaskRow key={task.id} task={task} projectSlug={projectSlug} />
         ))}
       </TableBody>
