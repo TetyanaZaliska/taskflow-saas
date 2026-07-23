@@ -117,6 +117,53 @@ export class TasksService {
     }
   }
 
+  async getProjectTaskWithMembers(
+    projectId: number,
+    taskId: number,
+    userId: number,
+  ): Promise<TaskWithProjectAndMembers> {
+    await this.permissionsService.validateProjectAccess(userId, projectId);
+
+    try {
+      return await this.prismaService.task.findFirstOrThrow({
+        where: {
+          id: taskId,
+          projectId: projectId,
+        },
+        include: {
+          project: {
+            include: {
+              team: {
+                include: {
+                  members: {
+                    where: {
+                      user: {
+                        isActive: true,
+                      },
+                    },
+                    include: {
+                      user: {
+                        select: {
+                          id: true,
+                          email: true,
+                          isActive: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    } catch {
+      throw new NotFoundException(
+        `Task with id ${taskId} not found in this project.`,
+      );
+    }
+  }
+
   async removeTask(
     projectId: number,
     taskId: number,

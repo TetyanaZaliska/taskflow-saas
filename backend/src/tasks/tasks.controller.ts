@@ -49,11 +49,19 @@ export class TasksController {
   ) {
     return this.tasksService.getProjectTask(projectId, taskId, userId);
   }
+
+  @Get(':taskId/with-members')
+  @UseGuards(JwtAuthGuard, ProjectRolesGuard)
+  async getProjectTaskWithMembers(
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('taskId', ParseIntPipe) taskId: number,
     @CurrentUser('userId') userId: number,
   ) {
-    return this.tasksService.getTask(projectId, taskId, userId);
+    return this.tasksService.getProjectTaskWithMembers(
+      projectId,
+      taskId,
+      userId,
+    );
   }
 
   @Delete(':taskId')

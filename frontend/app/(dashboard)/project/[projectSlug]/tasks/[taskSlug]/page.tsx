@@ -1,8 +1,7 @@
 import { routes } from "@/app/common/constants/routes";
 import { assertNoErrors } from "@/app/common/util/error-redirect";
-import getTask from "./actions/get-task";
 import { TaskDetails } from "./components/task-details";
-import getMembers from "@/app/(dashboard)/teams/[teamId]/members/actions/get-members";
+import getProjectTaskWithMembers from "./actions/get-project-task-with-members";
 
 interface SingleTaskProps {
   params: Promise<{ projectSlug: string; taskSlug: string }>;
@@ -14,11 +13,13 @@ export default async function SingleTask({ params }: SingleTaskProps) {
   const taskSlug = (await params).taskSlug;
   const taskId = parseInt(taskSlug.split("-")[0], 10);
 
-  const task = await getTask(projectId, taskId);
+  // const task = await getProjectTask(projectId, taskId);
+  // assertNoErrors(task, routes.app.projectTasks(projectId));
+  // const members = await getMembers(task.project.teamId);
+  // assertNoErrors(members, routes.app.projectTasks(projectId));
+
+  const task = await getProjectTaskWithMembers(projectId, taskId);
   assertNoErrors(task, routes.app.projectTasks(projectId));
 
-  const members = await getMembers(task.project.teamId);
-  assertNoErrors(members, routes.app.projectTasks(projectId));
-
-  return <TaskDetails task={task} initialMembers={members} />;
+  return <TaskDetails task={task} initialMembers={task.project.team.members} />;
 }
