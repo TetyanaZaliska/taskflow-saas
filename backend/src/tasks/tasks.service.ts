@@ -88,7 +88,7 @@ export class TasksService {
     });
   }
 
-  async getTask(
+  async getProjectTask(
     projectId: number,
     taskId: number,
     userId: number,

@@ -42,7 +42,13 @@ export class TasksController {
 
   @Get(':taskId')
   @UseGuards(JwtAuthGuard, ProjectRolesGuard)
-  async getTask(
+  async getProjectTask(
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @CurrentUser('userId') userId: number,
+  ) {
+    return this.tasksService.getProjectTask(projectId, taskId, userId);
+  }
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('taskId', ParseIntPipe) taskId: number,
     @CurrentUser('userId') userId: number,
