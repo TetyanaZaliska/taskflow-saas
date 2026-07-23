@@ -169,8 +169,8 @@ export class TasksService {
     taskId: number,
     userId: number,
   ): Promise<Task> {
-    const task = await this.prismaService.task.findUnique({
-      where: { id: taskId },
+    const task = await this.prismaService.task.findFirst({
+      where: { id: taskId, projectId: projectId },
     });
 
     if (!task) {
@@ -190,7 +190,7 @@ export class TasksService {
     }
 
     return this.prismaService.task.delete({
-      where: { id: taskId },
+      where: { id: taskId, projectId: projectId },
     });
   }
 
