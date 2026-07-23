@@ -1,6 +1,6 @@
 import { get } from "@/app/common/util/fetch";
 import { routes } from "@/app/common/constants/routes";
-import { ProjectWithMembers } from "../interfaces/project-with-members.interface";
+import { ProjectWithMembers } from "../interfaces/project.interface";
 
 export default async function getProjectWithMembers(projectId: number) {
   return get<ProjectWithMembers>(

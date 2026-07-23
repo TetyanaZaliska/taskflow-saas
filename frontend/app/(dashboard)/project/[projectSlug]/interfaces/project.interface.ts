@@ -1,3 +1,5 @@
+import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
+
 export interface Project {
   id: number;
   name: string;
@@ -5,4 +7,12 @@ export interface Project {
   teamId: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProjectWithMembers extends Project {
+  team: {
+    id: number;
+    name: string;
+    members: MemberWithUser[];
+  };
 }
