@@ -7,12 +7,17 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskRequest } from './dto/create-task.request';
 import { PermissionsService } from '../permissions/permissions.service';
-import { Prisma, Task } from '@prisma/client';
+import { Project, Task } from '@prisma/client';
 import { UpdateTaskFieldsDto } from './dto/update-task-fields.dto';
+import { ProjectWithMembers } from '../project/project.service';
 
-export type TaskWithProject = Prisma.TaskGetPayload<{
-  include: { project: true };
-}>;
+export interface TaskWithProject extends Task {
+  project: Project;
+}
+
+export interface TaskWithProjectAndMembers extends Task {
+  project: ProjectWithMembers;
+}
 
 @Injectable()
 export class TasksService {
