@@ -5,6 +5,7 @@ import { CreateTaskModal } from "./components/create-task/create-task-modal";
 import getProjectWithMembers from "../actions/get-project-with-members";
 import { FormError } from "@/components/custom/form-error";
 import getTasks from "./actions/get-tasks";
+import { KanbanBoard } from "./components/kanban-board/kanban-board";
 
 interface TasksProps {
   params: Promise<{ projectSlug: string }>;
@@ -35,7 +36,11 @@ export default async function Tasks({ params }: TasksProps) {
         projectId={projectId}
         initialMembers={projectWithMembers.team.members}
       />
-      <TasksTable projectSlug={projectSlug} />
+      {hasTasksError ? (
+        <FormError error={tasks.error} />
+      ) : (
+        <KanbanBoard projectSlug={projectSlug} tasks={tasks} />
+      )}
     </>
   );
 }

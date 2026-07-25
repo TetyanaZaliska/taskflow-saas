@@ -128,3 +128,13 @@
     @apply font-sans;
   }
 }
+
+.droppable.active {
+  border: 1px solid cornflowerblue !important;
+  border-radius: 2px;
+}
+
+.droppable.active:not(:empty) {
+  border: 1px solid cornflowerblue !important;
+  border-radius: 2px;
+}
