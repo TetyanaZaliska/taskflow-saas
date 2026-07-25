@@ -4,14 +4,14 @@ import { useActionNotify } from "@/hooks/use-activity-notify";
 import updateTask from "../../actions/update-task";
 import { TaskWithProject } from "../../interfaces/task.interface";
 import { formatDate } from "@/app/common/util/format-date";
-import { TaskFieldDropdown } from "../../components/show-tasks/task-field-dropdown";
 import { TASK_STATUS_LIST } from "@/app/common/constants/task-status";
 import { AlertCircle } from "lucide-react";
 import { TASK_PRIORITY_LIST } from "@/app/common/constants/task-priority";
-import { AutoSaveTextarea } from "./auto-save-textarea";
 import { useMemo, useState } from "react";
 import { MemberWithUser } from "@/app/(dashboard)/teams/[teamId]/members/interfaces/member.interface";
 import { mapMembersToOptions } from "@/app/common/util/map-members";
+import { AutoSaveTextarea } from "@/components/custom/auto-save-textarea";
+import { TaskFieldDropdown } from "../../components/show-tasks/task-field-dropdown";
 
 interface TaskDetailsProps {
   task: TaskWithProject;
