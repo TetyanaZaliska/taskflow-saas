@@ -13,11 +13,6 @@ export default async function SingleTask({ params }: SingleTaskProps) {
   const taskSlug = (await params).taskSlug;
   const taskId = parseInt(taskSlug.split("-")[0], 10);
 
-  // const task = await getProjectTask(projectId, taskId);
-  // assertNoErrors(task, routes.app.projectTasks(projectId));
-  // const members = await getMembers(task.project.teamId);
-  // assertNoErrors(members, routes.app.projectTasks(projectId));
-
   const task = await getProjectTaskWithMembers(projectId, taskId);
   assertNoErrors(task, routes.app.projectTasks(projectId));
 
