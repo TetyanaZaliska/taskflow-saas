@@ -5,11 +5,12 @@ import { useEffect, useRef } from "react";
 
 interface AutoSaveTextareaProps {
   initialValue: string | undefined;
-  fieldName: "title" | "description";
+  fieldName: "title" | "description" | "name";
   className?: string;
   onUpdate: (formData: FormData) => Promise<void>;
 }
 
+// TODO(Tetiana): refactor component to a controlled input for race condition stability
 export function AutoSaveTextarea({
   initialValue,
   fieldName,
@@ -38,7 +39,8 @@ export function AutoSaveTextarea({
         name={fieldName}
         defaultValue={initialValue}
         onChange={adjustHeight}
-        onBlur={() => {
+        onBlur={(e) => {
+          if (e.target.value.trim() === (initialValue || "").trim()) return;
           formRef.current?.requestSubmit();
         }}
         className={cn("w-full min-h-[30px]", className)}
