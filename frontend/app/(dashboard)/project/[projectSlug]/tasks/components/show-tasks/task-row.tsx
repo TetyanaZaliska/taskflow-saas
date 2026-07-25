@@ -15,13 +15,15 @@ import { TaskFieldDropdown } from "./task-field-dropdown";
 import { routes } from "@/app/common/constants/routes";
 import { toSlug } from "@/app/common/util/to-slug";
 import Link from "next/link";
+import { ComponentRef, Ref } from "react";
 
 interface TaskRowProps {
   task: Task;
   projectSlug: string;
+  ref?: Ref<ComponentRef<typeof TableRow>>;
 }
 
-export default function TaskRow({ task, projectSlug }: TaskRowProps) {
+export default function TaskRow({ task, projectSlug, ref }: TaskRowProps) {
   const { handleResult } = useActionNotify();
 
   const handleRemoveTask = async () => {
@@ -40,9 +42,10 @@ export default function TaskRow({ task, projectSlug }: TaskRowProps) {
 
   return (
     <TableRow
-      className={cn("cursor-pointer hover:bg-muted/50 transition-colors")}
+      ref={ref}
+      className="cursor-pointer hover:bg-muted/50 transition-colors"
     >
-      <TableCell className="font-medium">
+      <TableCell className="font-medium  w-[30px]">
         <TaskFieldDropdown
           currentValue={task.priority}
           options={TASK_PRIORITY_LIST}
@@ -51,8 +54,10 @@ export default function TaskRow({ task, projectSlug }: TaskRowProps) {
           defaultIcon={AlertCircle}
         />
       </TableCell>
-      <TableCell className="text-right text-muted-foreground">{`TSK-${task.keyNumber}`}</TableCell>
-      <TableCell className="font-medium">
+      <TableCell className="text-right text-muted-foreground w-[50px]">
+        {`TSK-${task.keyNumber}`}
+      </TableCell>
+      <TableCell className="font-medium w-[50px]">
         <TaskFieldDropdown
           currentValue={task.status}
           options={TASK_STATUS_LIST}
