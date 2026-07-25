@@ -46,6 +46,7 @@ export function ProjectDetails({ project, taskLink }: ProjectDetailsProps) {
       </div>
 
       <Button variant="outline" className="w-full" asChild>
+        {/* prefetch={false} prevents background prefetch from canceling input requestSubmit onBlur */}
         <Link href={taskLink} prefetch={false}>
           Tasks
         </Link>
