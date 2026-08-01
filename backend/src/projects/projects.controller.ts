@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -14,6 +15,7 @@ import { CreateProjectRequest } from './dto/create-project.request';
 import { ProjectsService } from './projects.service';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 
 @Controller('teams/:teamId/projects')
 export class ProjectsController {
@@ -33,9 +35,10 @@ export class ProjectsController {
   @UseGuards(JwtAuthGuard, TeamRolesGuard)
   async getProjects(
     @Param('teamId', ParseIntPipe) teamId: number,
+    @Query() query: PaginationQueryDto,
     @CurrentUser() user: TokenPayload,
   ) {
-    return this.projectsService.getProjects(teamId, user.userId);
+    return this.projectsService.getProjects(teamId, query, user.userId);
   }
 
   @Delete(':projectId')
