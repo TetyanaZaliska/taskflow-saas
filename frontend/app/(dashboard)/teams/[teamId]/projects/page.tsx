@@ -3,6 +3,8 @@ import getTeam from "../actions/get-team";
 import { assertNoErrors } from "@/app/common/util/error-redirect";
 import { CreateProjectModal } from "./componets/create-project/create-project-modal";
 import ProjectsTable from "./componets/show-projects/projects-table";
+import { Suspense } from "react";
+import ProjectsTableSkeleton from "./componets/show-projects/projects-table-skeleton";
 
 interface MembersProps {
   params: Promise<{ teamId: string }>;
@@ -20,7 +22,9 @@ export default async function Members({ params }: MembersProps) {
         {team.name}
       </h2>
       <CreateProjectModal teamId={teamId} />
+      <Suspense key={teamId} fallback={<ProjectsTableSkeleton />}>
       <ProjectsTable teamId={teamId} />
+      </Suspense>
     </>
   );
 }
