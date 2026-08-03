@@ -3,6 +3,7 @@
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { ReactNode } from "react";
 import { AuthContext } from "./(auth)/auth-context";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -21,7 +22,7 @@ export default function AppProviders({
       disableTransitionOnChange
     >
       <AuthContext.Provider value={authenticated}>
-        {children}
+        <NuqsAdapter>{children}</NuqsAdapter>
       </AuthContext.Provider>
     </ThemeProvider>
   );
