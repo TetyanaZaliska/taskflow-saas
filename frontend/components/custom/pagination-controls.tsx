@@ -1,6 +1,10 @@
 "use client";
 
-import { PAGE_LIMIT } from "@/app/common/constants/constants";
+import {
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_LIMIT,
+  ROWS_PER_PAGE_OPTIONS,
+} from "@/app/common/constants/constants";
 import { PaginationMeta } from "@/app/common/interfaces/pagination.interface";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -31,11 +35,13 @@ export function PaginationControls({ meta }: PaginationControlsProps) {
 
   const [curPage, setCurPage] = useQueryState(
     "page",
-    parseAsInteger.withDefault(1).withOptions({ shallow: false }),
+    parseAsInteger.withDefault(DEFAULT_PAGE).withOptions({ shallow: false }),
   );
   const [curLimit, setCurLimit] = useQueryState(
     "limit",
-    parseAsInteger.withDefault(PAGE_LIMIT).withOptions({ shallow: false }),
+    parseAsInteger
+      .withDefault(DEFAULT_PAGE_LIMIT)
+      .withOptions({ shallow: false }),
   );
 
   const getPageNumbers = () => {
@@ -88,10 +94,13 @@ export function PaginationControls({ meta }: PaginationControlsProps) {
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
+              {ROWS_PER_PAGE_OPTIONS.map((val) => {
+                return (
+                  <SelectItem key={val} value={val}>
+                    {val}
+                  </SelectItem>
+                );
+              })}
             </SelectGroup>
           </SelectContent>
         </Select>

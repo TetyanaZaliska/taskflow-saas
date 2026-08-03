@@ -5,7 +5,10 @@ import { CreateProjectModal } from "./componets/create-project/create-project-mo
 import ProjectsTable from "./componets/show-projects/projects-table";
 import { Suspense } from "react";
 import ProjectsTableSkeleton from "./componets/show-projects/projects-table-skeleton";
-import { PAGE_LIMIT } from "@/app/common/constants/constants";
+import {
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_LIMIT,
+} from "@/app/common/constants/constants";
 
 interface MembersProps {
   params: Promise<{ teamId: string }>;
@@ -18,9 +21,12 @@ export default async function Members({ params, searchParams }: MembersProps) {
 
   assertNoErrors(team, routes.app.teams);
 
-  const currentPage = parseInt((await searchParams).page || "1", 10);
+  const currentPage = parseInt(
+    (await searchParams).page || `${DEFAULT_PAGE}`,
+    10,
+  );
   const currentLimit = parseInt(
-    (await searchParams).limit || `${PAGE_LIMIT}`,
+    (await searchParams).limit || `${DEFAULT_PAGE_LIMIT}`,
     10,
   );
 
