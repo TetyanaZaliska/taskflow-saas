@@ -30,6 +30,9 @@ export default async function Members({ params, searchParams }: MembersProps) {
     (await searchParams).limit || `${DEFAULT_PAGE_LIMIT}`,
     10,
   );
+  const selectValue = ALLOWED_PAGE_LIMITS.includes(currentLimit)
+    ? currentLimit
+    : DEFAULT_PAGE_LIMIT;
 
   return (
     <>
@@ -40,7 +43,7 @@ export default async function Members({ params, searchParams }: MembersProps) {
       <Suspense key={teamId} fallback={<ProjectsTableSkeleton />}>
         <ProjectsTable
           teamId={teamId}
-          currentLimit={currentLimit}
+          currentLimit={selectValue}
           currentPage={currentPage}
         />
       </Suspense>

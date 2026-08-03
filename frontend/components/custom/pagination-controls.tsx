@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQueryState, parseAsInteger } from "nuqs";
+import { useQueryState, parseAsInteger, parseAsNumberLiteral } from "nuqs";
 
 interface PaginationControlsProps {
   meta: PaginationMeta;
@@ -37,9 +37,10 @@ export function PaginationControls({ meta }: PaginationControlsProps) {
     "page",
     parseAsInteger.withDefault(DEFAULT_PAGE).withOptions({ shallow: false }),
   );
+
   const [curLimit, setCurLimit] = useQueryState(
     "limit",
-    parseAsInteger
+    parseAsNumberLiteral(ALLOWED_PAGE_LIMITS)
       .withDefault(DEFAULT_PAGE_LIMIT)
       .withOptions({ shallow: false }),
   );
