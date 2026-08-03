@@ -6,6 +6,7 @@ import ProjectsTable from "./componets/show-projects/projects-table";
 import { Suspense } from "react";
 import ProjectsTableSkeleton from "./componets/show-projects/projects-table-skeleton";
 import {
+  ALLOWED_PAGE_LIMITS,
   DEFAULT_PAGE,
   DEFAULT_PAGE_LIMIT,
 } from "@/app/common/constants/constants";

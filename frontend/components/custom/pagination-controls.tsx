@@ -3,7 +3,7 @@
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_LIMIT,
-  ROWS_PER_PAGE_OPTIONS,
+  ALLOWED_PAGE_LIMITS,
 } from "@/app/common/constants/constants";
 import { PaginationMeta } from "@/app/common/interfaces/pagination.interface";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -94,9 +94,9 @@ export function PaginationControls({ meta }: PaginationControlsProps) {
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              {ROWS_PER_PAGE_OPTIONS.map((val) => {
+              {ALLOWED_PAGE_LIMITS.map((val) => {
                 return (
-                  <SelectItem key={val} value={val}>
+                  <SelectItem key={val} value={`${val}`}>
                     {val}
                   </SelectItem>
                 );
