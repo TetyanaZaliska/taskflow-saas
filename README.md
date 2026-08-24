@@ -153,7 +153,26 @@ This separation allows the backend API to remain independent from the frontend a
 │   │   ├── app/
 |   |   |   ├── (public)/       # landing, about, blog, contacts
 |   |   |   ├── (auth)/         # login, signup, forgot-password, logout
-|   |   |   ├── (dashboard)/    # teams, projects, tasks, settings, activity
+|   |   |   ├── (dashboard)/
+|   |   |   |   ├── project/
+|   |   |   |   |   ├── [projectSlug]/
+|   |   |   |   |   |   ├── tasks/
+|   |   |   |   |   |   |   ├── [taskSlug]/
+|   |   |   |   |   |   |   └── ...
+|   |   |   |   |   |   └── ...
+|   |   |   |   |   |
+|   |   |   |   |   └── ...
+|   |   |   |   |
+|   |   |   |   ├── teams/
+|   |   |   |   |   ├── [teamId]/
+|   |   |   |   |   |   ├── members/
+|   |   |   |   |   |   ├── projects/
+|   |   |   |   |   |   └── ...
+|   |   |   |   |   |
+|   |   |   |   |   └── ...
+|   |   |   |   |
+|   |   |   |   └── ...
+|   |   |   |
 |   |   |   ├── common/         # constants, interfaces, util
 |   |   |   ├── layout.tsx
 |   |   |   └── ...
