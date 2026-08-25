@@ -31,14 +31,14 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 
+### Install ONLY production dependencies (without trash for development)
+
+RUN npm ci --only=production
+
 ### Copy generated Prisma Client from stage 1
 
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
-### Install ONLY production dependencies (without trash for development)
-
-RUN npm ci --only=production
 
 ### Copy built NestJS code and Prisma migrations 
 

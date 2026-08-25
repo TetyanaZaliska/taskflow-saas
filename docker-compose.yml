@@ -29,6 +29,7 @@ services:
       PORT: ${BACKEND_PORT}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
     depends_on:
       - postgres-db
     networks:
