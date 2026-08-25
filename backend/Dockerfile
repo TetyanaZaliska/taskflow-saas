@@ -45,5 +45,9 @@ COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/clie
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
+# push db if not exist
+COPY entrypoint.sh ./
+RUN chmod +x entrypoint.sh
+
 EXPOSE 5000
-CMD ["node", "dist/main"]
+CMD ["./entrypoint.sh"]
