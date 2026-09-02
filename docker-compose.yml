@@ -1,4 +1,5 @@
 services:
+  # PostgreSQL
   postgres-db:
     image: postgres:15-alpine
     container_name: taskflow-postgres
@@ -11,6 +12,22 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - taskflow-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: taskflow-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672" # port for NestJS
+      - "15672:15672" # port for webbrowser
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USER?Error: no RABBITMQ_USER in .env}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD?Error: no RABBITMQ_PASSWORD in .env}"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - taskflow-network
 
@@ -28,8 +45,10 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
+      RABBITMQ_URL: "amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672"
     depends_on:
       - postgres-db
+      - rabbitmq
     networks:
       - taskflow-network
 
@@ -52,6 +71,7 @@ services:
 
 volumes:
   postgres_data:
+  rabbitmq_data:
 
 networks:
   taskflow-network:
