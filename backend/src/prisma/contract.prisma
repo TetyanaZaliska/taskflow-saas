@@ -48,7 +48,7 @@ namespace public {
     description String?
     teamId      Int
     createdAt   Timestamp(3) @default(now())
-    updatedAt   Timestamp(3)
+    updatedAt   Timestamp(3) @default(now())
     nextTaskKey Int          @default(1)
     authorId    Int
     tasks       Task[]
@@ -81,7 +81,7 @@ namespace public {
     assigneeId  Int?
     authorId    Int
     createdAt   Timestamp(3)          @default(now())
-    updatedAt   Timestamp(3)
+    updatedAt   Timestamp(3)          @default(now()) 
     keyNumber   Int
     assignee    TeamMember?           @relation(fields: [assigneeId], references: [id], onDelete: SetNull, onUpdate: Cascade, map: "Task_assigneeId_fkey", index: false)
     author      User                  @relation(fields: [authorId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "Task_authorId_fkey", index: false)
