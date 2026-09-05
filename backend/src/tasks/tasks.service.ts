@@ -7,9 +7,12 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskRequest } from './dto/create-task.request';
 import { PermissionsService } from '../permissions/permissions.service';
-import { Project, Task } from '@prisma/client';
+import type { FieldOutputTypes } from '../prisma/contract.d';
 import { UpdateTaskFieldsDto } from './dto/update-task-fields.dto';
 import { ProjectWithMembers } from '../project/project.service';
+
+export type Project = FieldOutputTypes['public']['Project'];
+export type Task = FieldOutputTypes['public']['Task'];
 
 export interface TaskWithProject extends Task {
   project: Project;
@@ -33,27 +36,20 @@ export class TasksService {
   ): Promise<Task> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    return this.prismaService.$transaction(async (tx) => {
-      const project = await tx.project.findUnique({
-        where: { id: projectId },
-        select: {
-          teamId: true,
-          nextTaskKey: true,
-        },
-      });
+    return this.prismaService.db.transaction(async (tx) => {
+      const project = await tx.orm.public.Project.select(
+        'teamId',
+        'nextTaskKey',
+      ).first({ id: projectId });
 
       if (!project) {
         throw new NotFoundException('Project not found');
       }
 
       if (data.assigneeId) {
-        const isMemberOfTeam = await tx.teamMember.findUnique({
-          where: {
-            userId_teamId: {
-              userId: data.assigneeId,
-              teamId: project.teamId,
-            },
-          },
+        const isMemberOfTeam = await tx.orm.public.TeamMember.first({
+          userId: data.assigneeId,
+          teamId: project.teamId,
         });
 
         if (!isMemberOfTeam) {
@@ -65,18 +61,15 @@ export class TasksService {
 
       const currentTaskKey = project.nextTaskKey;
 
-      const newTask = await tx.task.create({
-        data: {
-          ...data,
-          keyNumber: currentTaskKey,
-          projectId: projectId,
-          authorId: userId,
-        },
+      const newTask = await tx.orm.public.Task.create({
+        ...data,
+        keyNumber: currentTaskKey,
+        projectId: projectId,
+        authorId: userId,
       });
 
-      await tx.project.update({
-        where: { id: projectId },
-        data: { nextTaskKey: { increment: 1 } },
+      await tx.orm.public.Project.where({ id: projectId }).update({
+        nextTaskKey: currentTaskKey + 1,
       });
 
       return newTask;
@@ -86,11 +79,9 @@ export class TasksService {
   async getProjectTasks(projectId: number, userId: number): Promise<Task[]> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    return this.prismaService.task.findMany({
-      where: {
-        projectId: projectId,
-      },
-    });
+    return this.prismaService.db.orm.public.Task.where({
+      projectId: projectId,
+    }).all();
   }
 
   async getProjectTask(
@@ -100,21 +91,20 @@ export class TasksService {
   ): Promise<TaskWithProject> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    try {
-      return await this.prismaService.task.findFirstOrThrow({
-        where: {
-          id: taskId,
-          projectId: projectId,
-        },
-        include: {
-          project: true,
-        },
-      });
-    } catch {
+    const task = await this.prismaService.db.orm.public.Task.where({
+      id: taskId,
+      projectId: projectId,
+    })
+      .include('project')
+      .first();
+
+    if (!task) {
       throw new NotFoundException(
         `Task with id ${taskId} not found in this project.`,
       );
     }
+
+    return task;
   }
 
   async getProjectTaskWithMembers(

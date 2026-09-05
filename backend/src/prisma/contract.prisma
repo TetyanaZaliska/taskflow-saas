@@ -1,0 +1,108 @@
+// use prisma-next
+// Contract inferred from the live database schema. Edit as needed, then run `prisma contract emit`.
+
+namespace public {
+  model PrismaMigrations {
+    id                VarChar(36)  @id(map: "_prisma_migrations_pkey")
+    checksum          VarChar(64)
+    finishedAt        Timestamptz? @map("finished_at")
+    migrationName     VarChar(255) @map("migration_name")
+    logs              String?
+    rolledBackAt      Timestamptz? @map("rolled_back_at")
+    startedAt         Timestamptz  @default(now()) @map("started_at")
+    appliedStepsCount Int          @default(0) @map("applied_steps_count")
+
+    @@map("_prisma_migrations")
+  }
+
+  model User {
+    id          Int          @id(map: "User_pkey") @default(autoincrement())
+    email       String
+    password    String
+    createdAt   Timestamp(3) @default(now())
+    isActive    Boolean      @default(true)
+    projects    Project[]
+    tasks       Task[]
+    teams       Team[]
+    teamMembers TeamMember[]
+
+    @@index([email], map: "User_email_key", unique: true)
+    @@map("User")
+  }
+
+  model Team {
+    id          Int          @id(map: "Team_pkey") @default(autoincrement())
+    name        String
+    createdAt   Timestamp(3) @default(now())
+    ownerId     Int
+    projects    Project[]
+    teamMembers TeamMember[]
+    owner       User         @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "Team_ownerId_fkey", index: false)
+  
+    @@map("Team")
+  }
+
+  model Project {
+    id          Int          @id(map: "Project_pkey") @default(autoincrement())
+    name        String
+    description String?
+    teamId      Int
+    createdAt   Timestamp(3) @default(now())
+    updatedAt   Timestamp(3)
+    nextTaskKey Int          @default(1)
+    authorId    Int
+    tasks       Task[]
+    author      User         @relation(fields: [authorId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "Project_authorId_fkey", index: false)
+    team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Project_teamId_fkey", index: false)
+    @@map("Project")
+  }
+
+  model TeamMember {
+    id        Int               @id(map: "TeamMember_pkey") @default(autoincrement())
+    userId    Int
+    teamId    Int
+    role      pg.enum(TeamRole) @default("MEMBER")
+    createdAt Timestamp(3)      @default(now())
+    tasks     Task[]
+    team      Team              @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "TeamMember_teamId_fkey", index: false)
+    user      User              @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "TeamMember_userId_fkey", index: false)
+
+    @@index([userId, teamId], map: "TeamMember_userId_teamId_key", unique: true)
+    @@map("TeamMember")
+  }
+
+  model Task {
+    id          Int                   @id(map: "Task_pkey") @default(autoincrement())
+    title       String
+    description String?
+    status      pg.enum(TaskStatus)   @default("TODO")
+    priority    pg.enum(TaskPriority) @default("MEDIUM")
+    projectId   Int
+    assigneeId  Int?
+    authorId    Int
+    createdAt   Timestamp(3)          @default(now())
+    updatedAt   Timestamp(3)
+    keyNumber   Int
+    assignee    TeamMember?           @relation(fields: [assigneeId], references: [id], onDelete: SetNull, onUpdate: Cascade, map: "Task_assigneeId_fkey", index: false)
+    author      User                  @relation(fields: [authorId], references: [id], onDelete: Restrict, onUpdate: Cascade, map: "Task_authorId_fkey", index: false)
+    project     Project               @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Task_projectId_fkey", index: false)
+    @@map("Task")
+  }
+
+  native_enum TaskPriority {
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+  }
+
+  native_enum TaskStatus {
+    TODO = "TODO"
+    IN_PROGRESS = "IN_PROGRESS"
+    DONE = "DONE"
+  }
+
+  native_enum TeamRole {
+    ADMIN = "ADMIN"
+    MEMBER = "MEMBER"
+  }
+}
