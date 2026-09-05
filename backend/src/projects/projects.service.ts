@@ -6,10 +6,12 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectRequest } from './dto/create-project.request';
 import { PermissionsService } from '../permissions/permissions.service';
-import { Project } from '@prisma/client';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { PaginatedResponse } from '../common/interfaces/paginated-response.interface';
 import { PAGE_LIMIT } from '../common/constants/constants';
+import { FieldOutputTypes } from '../prisma/contract';
+
+export type Project = FieldOutputTypes['public']['Project'];
 
 @Injectable()
 export class ProjectsService {
@@ -25,13 +27,12 @@ export class ProjectsService {
   ): Promise<Project> {
     await this.permissionsService.validateTeamAccess(userId, teamId);
 
-    return await this.prismaService.project.create({
-      data: {
-        ...data,
-        teamId: teamId,
-        authorId: userId,
-      },
+    const project = await this.prismaService.db.orm.public.Project.create({
+      ...data,
+      teamId: teamId,
+      authorId: userId,
     });
+    return project;
   }
 
   async getProjects(
@@ -45,9 +46,10 @@ export class ProjectsService {
     const limit = Number(query.limit) || PAGE_LIMIT;
     const skip = (page - 1) * limit;
 
-    const totalCount = await this.prismaService.project.count({
-      where: { teamId },
-    });
+    const result = await this.prismaService.db.orm.public.Project.where({
+      teamId,
+    }).aggregate((a) => ({ total: a.count() }));
+    const totalCount = result.total;
 
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -63,12 +65,13 @@ export class ProjectsService {
       };
     }
 
-    const projects = await this.prismaService.project.findMany({
-      where: { teamId },
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-    });
+    const projects = await this.prismaService.db.orm.public.Project.where({
+      teamId,
+    })
+      .orderBy((project) => project.createdAt.desc())
+      .limit(limit)
+      .offset(skip)
+      .all();
 
     return {
       data: projects,
@@ -86,9 +89,10 @@ export class ProjectsService {
     projectId: number,
     userId: number,
   ): Promise<Project> {
-    const projectToRemove = await this.prismaService.project.findUnique({
-      where: { id: projectId },
-    });
+    const projectToRemove =
+      await this.prismaService.db.orm.public.Project.where({
+        id: projectId,
+      }).first();
 
     if (!projectToRemove || projectToRemove.teamId !== teamId) {
       throw new NotFoundException('Project not found for this team.');
@@ -106,8 +110,14 @@ export class ProjectsService {
       );
     }
 
-    return this.prismaService.project.delete({
-      where: { id: projectId },
-    });
+    const project = await this.prismaService.db.orm.public.Project.where({
+      id: projectId,
+    }).delete();
+
+    if (!project) {
+      throw new NotFoundException('Project not found for this team.');
+    }
+
+    return project;
   }
 }
