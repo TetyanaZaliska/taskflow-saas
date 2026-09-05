@@ -5,8 +5,11 @@ import {
 } from '@nestjs/common';
 import { CreateTeamRequest } from './dto/create-team.request';
 import { PrismaService } from '../prisma/prisma.service';
-import { Team, TeamRole } from '@prisma/client';
 import { PermissionsService } from '../permissions/permissions.service';
+import { FieldOutputTypes } from '../prisma/contract';
+import { getAdminRole } from '../common/constants/enums';
+
+export type Team = FieldOutputTypes['public']['Team'];
 
 @Injectable()
 export class TeamsService {
@@ -16,39 +19,29 @@ export class TeamsService {
   ) {}
 
   async createTeam(data: CreateTeamRequest, userId: number): Promise<Team> {
-    return await this.prismaService.team.create({
-      data: {
-        //name: data.name,
-        ...data,
-        ownerId: userId,
-        members: {
-          create: {
-            userId,
-            role: TeamRole.ADMIN,
-          },
-        },
-      },
+    return await this.prismaService.db.orm.public.Team.create({
+      ...data,
+      ownerId: userId,
+      teamMembers: (teamMembers) =>
+        teamMembers.create({
+          userId,
+          role: getAdminRole(),
+        }),
     });
   }
 
   async getTeams(userId: number): Promise<Team[]> {
-    return await this.prismaService.team.findMany({
-      where: {
-        members: {
-          some: {
-            userId: userId,
-          },
-        },
-      },
-    });
+    return await this.prismaService.db.orm.public.Team.where((team) =>
+      team.teamMembers.some((member) => member.userId.eq(userId)),
+    ).all();
   }
 
   async getTeam(teamId: number, userId: number): Promise<Team> {
     await this.permissionsService.validateTeamAccess(userId, teamId);
 
-    const team = await this.prismaService.team.findUnique({
-      where: { id: teamId },
-    });
+    const team = await this.prismaService.db.orm.public.Team.where({
+      id: teamId,
+    }).first();
 
     if (!team) {
       throw new NotFoundException(`Team not found with id ${teamId}`);
@@ -58,9 +51,9 @@ export class TeamsService {
   }
 
   async removeTeam(teamId: number, userId: number): Promise<Team> {
-    const teamToDelete = await this.prismaService.team.findUnique({
-      where: { id: teamId },
-    });
+    const teamToDelete = await this.prismaService.db.orm.public.Team.where({
+      id: teamId,
+    }).first();
 
     if (!teamToDelete) {
       throw new NotFoundException('Team not found.');
@@ -84,9 +77,13 @@ export class TeamsService {
       );
     }
 
-    const deletedTeam = await this.prismaService.team.delete({
-      where: { id: teamId },
-    });
+    const deletedTeam = await this.prismaService.db.orm.public.Team.where({
+      id: teamId,
+    }).delete();
+
+    if (!deletedTeam) {
+      throw new NotFoundException('Team not found.');
+    }
 
     return deletedTeam;
   }
