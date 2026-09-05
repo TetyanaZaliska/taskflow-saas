@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
-import { PAGE_LIMIT } from '../../constants/constants';
+import { PAGE_LIMIT } from '../../common/constants/constants';
 
 export class PaginationQueryDto {
   @IsOptional()

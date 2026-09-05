@@ -8,8 +8,8 @@ import { CreateProjectRequest } from './dto/create-project.request';
 import { PermissionsService } from '../permissions/permissions.service';
 import { Project } from '@prisma/client';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
-import { PaginatedResponse } from '../interfaces/paginated-response.interface';
-import { PAGE_LIMIT } from '../constants/constants';
+import { PaginatedResponse } from '../common/interfaces/paginated-response.interface';
+import { PAGE_LIMIT } from '../common/constants/constants';
 
 @Injectable()
 export class ProjectsService {

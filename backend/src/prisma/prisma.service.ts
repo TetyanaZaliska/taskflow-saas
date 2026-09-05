@@ -3,7 +3,7 @@ import { db } from './db';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
-  private runtime: Awaited<ReturnType<typeof db.connect>>;
+  private runtime!: Awaited<ReturnType<typeof db.connect>>;
 
   readonly db = db;
 
