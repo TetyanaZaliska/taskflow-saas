@@ -5,11 +5,11 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { TeamRole } from '@prisma/client';
 import { TEAM_ROLES_KEY } from '../common/constants/constants';
 import { PermissionsService } from '../permissions/permissions.service';
 import { Request } from 'express';
 import { TokenPayload } from '../auth/token-payload.interface';
+import { TeamRole } from '../common/interfaces/enums';
 
 @Injectable()
 export class TeamRolesGuard implements CanActivate {
