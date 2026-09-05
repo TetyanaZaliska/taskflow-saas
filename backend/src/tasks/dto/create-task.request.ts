@@ -1,6 +1,10 @@
-import { TaskPriority, TaskStatus } from '@prisma/client';
 import { IsEnum, IsInt, IsOptional, IsString, Length } from 'class-validator';
 import { ToOptionalInt } from '../../decorators/to-optional-int.decorator';
+import {
+  TaskPriorityValues,
+  TaskStatusValues,
+} from '../../common/constants/enums';
+import type { TaskPriority, TaskStatus } from '../../common/interfaces/enums';
 
 export class CreateTaskRequest {
   @IsString()
@@ -11,11 +15,11 @@ export class CreateTaskRequest {
   @IsOptional()
   description?: string;
 
-  @IsEnum(TaskStatus)
+  @IsEnum(TaskStatusValues)
   @IsOptional()
   status?: TaskStatus;
 
-  @IsEnum(TaskPriority)
+  @IsEnum(TaskPriorityValues)
   @IsOptional()
   priority?: TaskPriority;
 

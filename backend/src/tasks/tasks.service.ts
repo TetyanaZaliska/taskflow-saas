@@ -95,7 +95,17 @@ export class TasksService {
       id: taskId,
       projectId: projectId,
     })
-      .include('project')
+      .include('project', (project) =>
+        project.select(
+          'id',
+          'name',
+          'teamId',
+          'nextTaskKey',
+          'authorId',
+          'createdAt',
+          'updatedAt',
+        ),
+      )
       .first();
 
     if (!task) {
@@ -104,7 +114,7 @@ export class TasksService {
       );
     }
 
-    return task;
+    return task as unknown as TaskWithProject;
   }
 
   async getProjectTaskWithMembers(
@@ -114,44 +124,39 @@ export class TasksService {
   ): Promise<TaskWithProjectAndMembers> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    try {
-      return await this.prismaService.task.findFirstOrThrow({
-        where: {
-          id: taskId,
-          projectId: projectId,
-        },
-        include: {
-          project: {
-            include: {
-              team: {
-                include: {
-                  members: {
-                    where: {
-                      user: {
-                        isActive: true,
-                      },
-                    },
-                    include: {
-                      user: {
-                        select: {
-                          id: true,
-                          email: true,
-                          isActive: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-    } catch {
+    const task = await this.prismaService.db.orm.public.Task.where({
+      id: taskId,
+      projectId: projectId,
+    })
+      .include('project', (project) =>
+        project
+          .select(
+            'id',
+            'name',
+            'teamId',
+            'nextTaskKey',
+            'authorId',
+            'createdAt',
+            'updatedAt',
+          )
+          .include('team', (team) =>
+            team.include('teamMembers', (teamMembers) =>
+              teamMembers
+                .where((m) => m.user.some({ isActive: true }))
+                .include('user', (user) =>
+                  user.select('id', 'email', 'isActive'),
+                ),
+            ),
+          ),
+      )
+      .first();
+
+    if (!task) {
       throw new NotFoundException(
         `Task with id ${taskId} not found in this project.`,
       );
     }
+    return task as unknown as TaskWithProjectAndMembers;
   }
 
   async removeTask(
@@ -159,9 +164,10 @@ export class TasksService {
     taskId: number,
     userId: number,
   ): Promise<Task> {
-    const task = await this.prismaService.task.findFirst({
-      where: { id: taskId, projectId: projectId },
-    });
+    const task = await this.prismaService.db.orm.public.Task.where({
+      id: taskId,
+      projectId: projectId,
+    }).first();
 
     if (!task) {
       throw new NotFoundException('Task not found');
@@ -179,9 +185,16 @@ export class TasksService {
       );
     }
 
-    return this.prismaService.task.delete({
-      where: { id: taskId, projectId: projectId },
-    });
+    const deletedTask = await this.prismaService.db.orm.public.Task.where({
+      id: taskId,
+      projectId: projectId,
+    }).delete();
+
+    if (!deletedTask) {
+      throw new NotFoundException('Task not deleted');
+    }
+
+    return deletedTask;
   }
 
   async updateTaskFields(
@@ -192,18 +205,17 @@ export class TasksService {
   ): Promise<Task> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    try {
-      return await this.prismaService.task.update({
-        where: {
-          id: taskId,
-          projectId: projectId,
-        },
-        data,
-      });
-    } catch {
+    const task = await this.prismaService.db.orm.public.Task.where({
+      id: taskId,
+      projectId: projectId,
+    }).update(data);
+
+    if (!task) {
       throw new NotFoundException(
         `Task with id ${taskId} not found in this project.`,
       );
     }
+
+    return task;
   }
 }
