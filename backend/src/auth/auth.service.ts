@@ -1,8 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { User, UsersService } from '../users/users.service';
 import ms, { StringValue } from 'ms';
 import * as bcrypt from 'bcrypt';
-import { User } from '@prisma/client';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './token-payload.interface';

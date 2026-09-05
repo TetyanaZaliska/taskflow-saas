@@ -5,8 +5,11 @@ import {
 } from '@nestjs/common';
 import { CreateUserRequest } from './dto/create-user.request';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { isStructuredError } from '@prisma/orm-postgres/utils';
+import { FieldOutputTypes } from '../prisma/contract';
+
+export type User = FieldOutputTypes['public']['User'];
 
 @Injectable()
 export class UsersService {
@@ -16,32 +19,26 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     try {
-      return await this.prismaService.user.create({
-        data: {
-          ...data,
-          password: hashedPassword,
-        },
-        select: {
-          email: true,
-          id: true,
-        },
+      return await this.prismaService.db.orm.public.User.select(
+        'email',
+        'id',
+      ).create({
+        ...data,
+        password: hashedPassword,
       });
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') {
-          throw new UnprocessableEntityException('Email already exists.');
-        }
+      if (isStructuredError(err) && err.code.endsWith('P2002')) {
+        throw new UnprocessableEntityException('Email already exists.');
       }
       throw err;
     }
   }
 
-  async getUser(filter: Prisma.UserWhereUniqueInput) {
-    const user = await this.prismaService.user.findUniqueOrThrow({
-      where: filter,
-    });
+  async getUser(filter: Partial<User>) {
+    const user =
+      await this.prismaService.db.orm.public.User.where(filter).first();
 
-    if (!user.isActive) {
+    if (!user?.isActive) {
       throw new ForbiddenException('This user account has been deactivated.');
     }
 
@@ -57,19 +54,15 @@ export class UsersService {
       return [];
     }
 
-    return this.prismaService.user.findMany({
-      where: {
-        isActive: true,
-        email: {
-          contains: query,
-          mode: 'insensitive',
-        },
-      },
-      select: {
-        id: true,
-        email: true,
-      },
-      take: 10,
-    });
+    const user = await this.prismaService.db.orm.public.User.where({
+      isActive: true,
+    })
+      .where((user) => user.email.ilike(`%${query}%`))
+      .where((user) => user.id.neq(curUserId))
+      .select('id', 'email')
+      .limit(10)
+      .all();
+
+    return user;
   }
 }
