@@ -1,10 +1,10 @@
-import contract from '../../prisma/contract.json' with { type: 'json' };
+import { db } from '../../prisma/db';
 import { TaskPriority, TaskStatus } from '../interfaces/enums';
 
-const statusMap =
-  contract.storage.namespaces.public.entries.valueSet.TaskStatus;
-const priorityMap =
-  contract.storage.namespaces.public.entries.valueSet.TaskPriority;
+export const TaskStatusMap = db.nativeEnums.public.TaskStatus.values;
+export const TaskPriorityMap = db.nativeEnums.public.TaskPriority.values;
 
-export const TaskStatusValues = Object.keys(statusMap) as TaskStatus[];
-export const TaskPriorityValues = Object.keys(priorityMap) as TaskPriority[];
+export const TaskStatusValues = Object.keys(TaskStatusMap) as TaskStatus[];
+export const TaskPriorityValues = Object.keys(
+  TaskPriorityMap,
+) as TaskPriority[];

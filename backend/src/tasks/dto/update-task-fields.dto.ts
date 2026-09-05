@@ -1,9 +1,6 @@
 import { IsEnum, IsInt, IsOptional, IsString, Length } from 'class-validator';
 import { ToOptionalInt } from '../../decorators/to-optional-int.decorator';
-import {
-  TaskPriorityValues,
-  TaskStatusValues,
-} from '../../common/constants/enums';
+import { TaskPriorityMap, TaskStatusMap } from '../../common/constants/enums';
 import type { TaskPriority, TaskStatus } from '../../common/interfaces/enums';
 
 export class UpdateTaskFieldsDto {
@@ -16,11 +13,11 @@ export class UpdateTaskFieldsDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(TaskStatusValues)
+  @IsEnum(TaskStatusMap)
   @IsOptional()
   status?: TaskStatus;
 
-  @IsEnum(TaskPriorityValues)
+  @IsEnum(TaskPriorityMap)
   @IsOptional()
   priority?: TaskPriority;
 
