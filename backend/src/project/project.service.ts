@@ -1,15 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PermissionsService } from '../permissions/permissions.service';
-import { Project } from '@prisma/client';
 import { MemberWithUserResponse } from '../team-members/team-members.service';
 import { UpdateProjectFields } from './dto/update-project-fields.dto';
+import { FieldOutputTypes } from '../prisma/contract';
+
+export type Project = FieldOutputTypes['public']['Project'];
 
 export interface ProjectWithMembers extends Project {
   team: {
     id: number;
     name: string;
-    members: MemberWithUserResponse[];
+    teamMembers: MemberWithUserResponse[];
   };
 }
 
@@ -23,49 +25,44 @@ export class ProjectService {
   async getProject(projectId: number, userId: number): Promise<Project> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    try {
-      return await this.prismaService.project.findUniqueOrThrow({
-        where: { id: projectId },
-      });
-    } catch {
+    const project = await this.prismaService.db.orm.public.Project.where({
+      id: projectId,
+    }).first();
+
+    if (!project) {
       throw new NotFoundException(`Project not found`);
     }
+
+    return project;
   }
+
   async getProjectWithMembers(
     projectId: number,
     userId: number,
   ): Promise<ProjectWithMembers> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    try {
-      return await this.prismaService.project.findUniqueOrThrow({
-        where: { id: projectId },
-        include: {
-          team: {
-            include: {
-              members: {
-                where: {
-                  user: {
-                    isActive: true,
-                  },
-                },
-                include: {
-                  user: {
-                    select: {
-                      id: true,
-                      email: true,
-                      isActive: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-    } catch {
+    const project = await this.prismaService.db.orm.public.Project.where({
+      id: projectId,
+    })
+      .include('team', (team) =>
+        team
+          .select('id', 'name')
+          .include('teamMembers', (teamMembers) =>
+            teamMembers
+              .where((member) => member.user.some({ isActive: true }))
+              .include('user', (user) =>
+                user.select('id', 'email', 'isActive'),
+              ),
+          ),
+      )
+      .first();
+
+    if (!project) {
       throw new NotFoundException(`Project not found`);
     }
+
+    return project;
   }
 
   async updateProjectFields(
@@ -75,15 +72,14 @@ export class ProjectService {
   ): Promise<Project> {
     await this.permissionsService.validateProjectAccess(userId, projectId);
 
-    try {
-      return await this.prismaService.project.update({
-        where: {
-          id: projectId,
-        },
-        data,
-      });
-    } catch {
+    const project = await this.prismaService.db.orm.public.Project.where({
+      id: projectId,
+    }).update(data);
+
+    if (!project) {
       throw new NotFoundException(`Project with id ${projectId} not found.`);
     }
+
+    return project;
   }
 }
