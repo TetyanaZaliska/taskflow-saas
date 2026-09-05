@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   MemberWithUserResponse,
+  TeamMember,
   TeamMembersService,
 } from './team-members.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -17,7 +18,6 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { type TokenPayload } from '../auth/token-payload.interface';
 import { AddMemberRequest } from './dto/add-member.request';
 import { TeamRolesGuard } from '../guards/team-roles.guard';
-import { TeamMember } from '@prisma/client';
 
 @Controller('teams/:teamId/members')
 export class TeamMembersController {

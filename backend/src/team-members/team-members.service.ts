@@ -7,9 +7,13 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddMemberRequest } from './dto/add-member.request';
-import { TeamMember, TeamRole } from '@prisma/client';
 import { PermissionsService } from '../permissions/permissions.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { TeamRole } from '../common/interfaces/enums';
+import { FieldOutputTypes } from '../prisma/contract';
+import { getAdminRole, getMemberRole } from '../common/constants/enums';
+import { isStructuredError } from '@prisma/orm-postgres/utils';
+
+export type TeamMember = FieldOutputTypes['public']['TeamMember'];
 
 export interface MemberWithUserResponse {
   id: number;
@@ -35,9 +39,9 @@ export class TeamMembersService {
     data: AddMemberRequest,
     curUserId: number,
   ): Promise<TeamMember> {
-    const team = await this.prismaService.team.findUnique({
-      where: { id: teamId },
-    });
+    const team = await this.prismaService.db.orm.public.Team.where({
+      id: teamId,
+    }).first();
 
     if (!team) {
       throw new NotFoundException('Team not found.');
@@ -55,35 +59,29 @@ export class TeamMembersService {
       );
     }
 
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        email: data.email,
-        isActive: true,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const user = await this.prismaService.db.orm.public.User.where({
+      email: data.email,
+      isActive: true,
+    })
+      .select('id')
+      .first();
 
     if (!user) {
       throw new NotFoundException('User not found!');
     }
+    const dataRole = data.role as TeamRole;
 
     try {
-      return await this.prismaService.teamMember.create({
-        data: {
-          userId: user.id,
-          teamId: teamId,
-          role: data.role ?? TeamRole.MEMBER,
-        },
+      return await this.prismaService.db.orm.public.TeamMember.create({
+        userId: user.id,
+        teamId: teamId,
+        role: dataRole ?? getMemberRole(),
       });
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error?.code === 'P2002') {
-          throw new ConflictException(
-            'This user is already a member of the team.',
-          );
-        }
+      if (isStructuredError(error) && error.code.endsWith('P2002')) {
+        throw new ConflictException(
+          'This user is already a member of the team.',
+        );
       }
 
       throw error;
@@ -96,27 +94,11 @@ export class TeamMembersService {
   ): Promise<MemberWithUserResponse[]> {
     await this.permissionsService.validateTeamAccess(curUserId, teamId);
 
-    return this.prismaService.teamMember.findMany({
-      where: {
-        teamId,
-        user: {
-          isActive: true,
-        },
-      },
-      select: {
-        id: true,
-        teamId: true,
-        userId: true,
-        role: true,
-        user: {
-          select: {
-            id: true,
-            email: true,
-            isActive: true,
-          },
-        },
-      },
-    });
+    return this.prismaService.db.orm.public.TeamMember.where({ teamId })
+      .where((member) => member.user.some((user) => user.isActive.eq(true)))
+      .select('id', 'teamId', 'userId', 'role')
+      .include('user', (user) => user.select('id', 'email', 'isActive'))
+      .all();
   }
 
   async removeMember(
@@ -124,12 +106,15 @@ export class TeamMembersService {
     removeUserId: number,
     curUserId: number,
   ): Promise<TeamMember> {
-    const memberToDelete = await this.prismaService.teamMember.findUnique({
-      where: {
-        userId_teamId: { teamId, userId: removeUserId },
-      },
-      include: { team: true },
-    });
+    const memberToDelete =
+      await this.prismaService.db.orm.public.TeamMember.where({
+        teamId,
+        userId: removeUserId,
+      })
+        .include('team', (team) =>
+          team.select('id', 'name', 'createdAt', 'ownerId'),
+        )
+        .first();
 
     if (!memberToDelete || memberToDelete.teamId !== teamId) {
       throw new NotFoundException('Member not found in this team.');
@@ -153,22 +138,31 @@ export class TeamMembersService {
       );
     }
 
-    return this.prismaService.$transaction(async (tx) => {
-      if (memberToDelete.role === TeamRole.ADMIN) {
-        const totalAdmins = await tx.teamMember.count({
-          where: { teamId, role: TeamRole.ADMIN },
-        });
+    const deletedMember = await this.prismaService.db.transaction(
+      async (tx) => {
+        if (memberToDelete.role === getAdminRole()) {
+          const totalAdmins = await tx.orm.public.TeamMember.where({
+            teamId,
+            role: getAdminRole(),
+          }).aggregate((a) => ({ total: a.count() }));
 
-        if (totalAdmins <= 1) {
-          throw new BadRequestException(
-            'Impossible to delete the last admin! Promote another team member first.',
-          );
+          if (totalAdmins.total <= 1) {
+            throw new BadRequestException(
+              'Impossible to delete the last admin! Promote another team member first.',
+            );
+          }
         }
-      }
 
-      return tx.teamMember.delete({
-        where: { id: memberToDelete.id },
-      });
-    });
+        return tx.orm.public.TeamMember.where({
+          id: memberToDelete.id,
+        }).delete();
+      },
+    );
+
+    if (!deletedMember) {
+      throw new NotFoundException('Member not found in this team.');
+    }
+
+    return deletedMember;
   }
 }

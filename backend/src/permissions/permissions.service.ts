@@ -1,20 +1,12 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { type TeamRole } from '../common/interfaces/enums';
-import { FieldOutputTypes } from '../prisma/contract';
-
-export type TeamMember = FieldOutputTypes['public']['TeamMember'];
+import { TeamMember } from '../team-members/team-members.service';
+import { getAdminRole } from '../common/constants/enums';
 
 @Injectable()
 export class PermissionsService {
   constructor(private readonly prismaService: PrismaService) {}
-
-  getAdminRole() {
-    const adminRole = this.prismaService.db.nativeEnums.public.TeamRole.nameOf(
-      'ADMIN',
-    ) as TeamRole;
-    return adminRole;
-  }
 
   async hasProjectAccess(
     userId: number,
@@ -78,7 +70,7 @@ export class PermissionsService {
     resourceAuthorId: number,
   ): Promise<boolean> {
     const isAdmin = await this.hasProjectAccess(userId, projectId, [
-      this.getAdminRole(),
+      getAdminRole(),
     ]);
     const isOwner = resourceAuthorId === userId;
 
@@ -91,7 +83,7 @@ export class PermissionsService {
     resourceAuthorId: number,
   ): Promise<boolean> {
     const isAdmin = await this.hasProjectAccess(userId, teamId, [
-      this.getAdminRole(),
+      getAdminRole(),
     ]);
     const isOwner = resourceAuthorId === userId;
 
