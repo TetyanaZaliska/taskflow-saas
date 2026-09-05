@@ -27,7 +27,10 @@ export class UsersService {
         password: hashedPassword,
       });
     } catch (err) {
-      if (isStructuredError(err) && err.code.endsWith('P2002')) {
+      if (
+        err?.name === 'SqlQueryError' &&
+        (err?.sqlState === '23505' || err?.constraint === 'User_email_key')
+      ) {
         throw new UnprocessableEntityException('Email already exists.');
       }
       throw err;
