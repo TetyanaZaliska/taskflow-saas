@@ -554,6 +554,9 @@ cd <project-directory>
 ### 2. Install dependencies
 
 ```bash
+cd backend
+npm install
+cd ../frontend
 npm install
 ```
 
@@ -562,6 +565,7 @@ npm install
 Using Docker:
 
 ```bash
+cd ../
 docker compose up -d
 ```
 
