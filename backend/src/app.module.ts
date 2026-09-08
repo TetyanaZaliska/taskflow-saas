@@ -8,9 +8,25 @@ import { TeamMembersModule } from './team-members/team-members.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ProjectModule } from './project/project.module';
 import { TasksModule } from './tasks/tasks.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const redisPort = configService.get<string>('REDIS_PORT') || '6379';
+        const redisUrl = `redis://localhost:${redisPort}`;
+
+        return {
+          connection: {
+            url: redisUrl,
+          },
+        };
+      },
+      inject: [ConfigService],
+    }),
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -32,7 +48,6 @@ import { TasksModule } from './tasks/tasks.module';
       },
       inject: [ConfigService],
     }),
-    ConfigModule.forRoot(),
     UsersModule,
     AuthModule,
     TeamsModule,

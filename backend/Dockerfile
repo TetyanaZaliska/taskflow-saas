@@ -1,16 +1,23 @@
 ### --- STAGE 1: Build ---
 
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 WORKDIR /app
 
-### Copy dependency files and Prisma schema
+### Copy dependency files 
 
 COPY package*.json ./
-COPY prisma ./prisma/
 
 ### Install all dependencies
 
 RUN npm ci
+
+#Copy Prisma schema
+
+COPY src/prisma ./src/prisma
+COPY prisma.config.mts ./ 
+RUN cp prisma.config.mts prisma.config.ts
+RUN npx prisma contract emit
+RUN rm prisma.config.ts
 
 ### Copy whole backend code
 
@@ -18,12 +25,11 @@ COPY . .
 
 ### Generate Prisma Client and build NestJS to production-code (folder dist)
 
-RUN npx prisma generate
 RUN npm run build
 
 ### --- STAGE 2: Run ---
 
-FROM node:20-alpine AS runner
+FROM node:25-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -33,17 +39,15 @@ COPY package*.json ./
 
 ### Install ONLY production dependencies (without trash for development)
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
-### Copy generated Prisma Client from stage 1
-
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
-### Copy built NestJS code and Prisma migrations 
+### Copy built NestJS code and Prisma 
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src/prisma ./src/prisma
+COPY --from=builder /app/prisma.config.mts ./prisma.config.mts
+
+COPY --from=builder /app/node_modules/@prisma/orm-postgres ./node_modules/@prisma/orm-postgres
 
 # push db if not exist
 COPY entrypoint.sh ./

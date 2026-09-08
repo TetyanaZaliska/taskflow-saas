@@ -42,6 +42,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       REDIS_URL: "redis://redis-queue:6379"
+      POSTGRES_PORT: "5432"
+      POSTGRES_HOST: "postgres-db"
     depends_on:
       - postgres-db
     networks:
