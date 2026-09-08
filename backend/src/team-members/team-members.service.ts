@@ -69,13 +69,12 @@ export class TeamMembersService {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    const dataRole = data.role as TeamRole;
 
     try {
       return await this.prismaService.db.orm.public.TeamMember.create({
         userId: user.id,
         teamId: teamId,
-        role: dataRole ?? getMemberRole(),
+        role: data.role ?? getMemberRole(),
       });
     } catch (error) {
       if (isStructuredError(error) && error.code.endsWith('P2002')) {

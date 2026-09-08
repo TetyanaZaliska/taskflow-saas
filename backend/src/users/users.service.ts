@@ -6,7 +6,6 @@ import {
 import { CreateUserRequest } from './dto/create-user.request';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { isStructuredError } from '@prisma/orm-postgres/utils';
 import { FieldOutputTypes } from '../prisma/contract';
 
 export type User = FieldOutputTypes['public']['User'];
@@ -27,9 +26,11 @@ export class UsersService {
         password: hashedPassword,
       });
     } catch (err) {
+      const error = err as Record<string, unknown>;
+
       if (
-        err?.name === 'SqlQueryError' &&
-        (err?.sqlState === '23505' || err?.constraint === 'User_email_key')
+        error?.name === 'SqlQueryError' &&
+        (error?.sqlState === '23505' || error?.constraint === 'User_email_key')
       ) {
         throw new UnprocessableEntityException('Email already exists.');
       }

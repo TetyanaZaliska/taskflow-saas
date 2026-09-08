@@ -82,9 +82,7 @@ export class PermissionsService {
     teamId: number,
     resourceAuthorId: number,
   ): Promise<boolean> {
-    const isAdmin = await this.hasProjectAccess(userId, teamId, [
-      getAdminRole(),
-    ]);
+    const isAdmin = await this.hasTeamAccess(userId, teamId, [getAdminRole()]);
     const isOwner = resourceAuthorId === userId;
 
     return isAdmin || isOwner;
