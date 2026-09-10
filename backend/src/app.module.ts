@@ -9,15 +9,18 @@ import { ProjectsModule } from './projects/projects.module';
 import { ProjectModule } from './project/project.module';
 import { TasksModule } from './tasks/tasks.module';
 import { BullModule } from '@nestjs/bullmq';
+import { AuthMailProcessor } from './auth/processors/auth-mail.processor';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: (configService: ConfigService) => {
         const redisPort = configService.get<string>('REDIS_PORT') || '6379';
-        const redisUrl = `redis://localhost:${redisPort}`;
+        const redisHost =
+          configService.get<string>('REDIS_HOST') || 'localhost';
+        const redisUrl = `redis://${redisHost}:${redisPort}`;
 
         return {
           connection: {
@@ -55,6 +58,7 @@ import { BullModule } from '@nestjs/bullmq';
     ProjectsModule,
     ProjectModule,
     TasksModule,
+    AuthMailProcessor,
   ],
   controllers: [],
   providers: [],

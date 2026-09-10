@@ -9,6 +9,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
+    ConfigModule,
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -19,8 +21,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       }),
       inject: [ConfigService],
     }),
-    ConfigModule,
-    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],
