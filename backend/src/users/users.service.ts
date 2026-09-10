@@ -7,16 +7,25 @@ import { CreateUserRequest } from './dto/create-user.request';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { InjectQueue } from '@nestjs/bullmq';
+import {
+  AUTH_MAIL_QUEUE,
+  AuthMailJobs,
+} from '../auth/constants/auth-jobs.constants';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @InjectQueue(AUTH_MAIL_QUEUE) private readonly mailQueue: Queue,
+  ) {}
 
   async createUser(data: CreateUserRequest) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     try {
-      return await this.prismaService.user.create({
+      const newUser = await this.prismaService.user.create({
         data: {
           ...data,
           password: hashedPassword,
@@ -26,6 +35,18 @@ export class UsersService {
           id: true,
         },
       });
+      await this.mailQueue.add(
+        AuthMailJobs.SEND_WELCOME_EMAIL,
+        {
+          email: newUser.email,
+          name: data.email ? data.email.split('@')[0] : 'User',
+        },
+        {
+          attempts: 3,
+          backoff: 5000,
+        },
+      );
+      return newUser;
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {
