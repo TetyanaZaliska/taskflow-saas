@@ -5,8 +5,9 @@ import { API_URL } from "@/app/common/constants/api";
 import { getErrorMessage } from "@/app/common/util/errors";
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import { AUTHENTICATION_COOKIE } from "../auth-cookie";
+import { revalidatePath } from "next/cache";
 
 export default async function login(
   _prevState: FormResponse,
@@ -22,7 +23,8 @@ export default async function login(
     return { error: getErrorMessage(parseRes) };
   }
   await setAuthCookie(res);
-  redirect("/dashboard");
+  revalidatePath("/", "layout");
+  redirect("/dashboard", RedirectType.replace);
 }
 
 const setAuthCookie = async (response: Response) => {

@@ -9,7 +9,7 @@ const unauthorizedRoutes: string[] = [
 
 export async function proxy(request: NextRequest) {
   if (
-    !(await authenticated()) &&
+    !(await authenticated(request)) &&
     !unauthorizedRoutes.includes(request.nextUrl.pathname)
   ) {
     return Response.redirect(new URL(routes.auth.login, request.url));
