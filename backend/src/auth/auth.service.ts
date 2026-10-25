@@ -8,6 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './token-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 
+type AuthResponse = Pick<Response, 'cookie'>;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -16,7 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  login(user: User, response: Response): { tokenPayload: TokenPayload } {
+  login(user: User, response: AuthResponse): { tokenPayload: TokenPayload } {
     const expires = new Date();
     expires.setMilliseconds(
       expires.getMilliseconds() +
