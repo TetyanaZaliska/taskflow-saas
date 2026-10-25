@@ -9,21 +9,29 @@ import { ProjectsModule } from './projects/projects.module';
 import { ProjectModule } from './project/project.module';
 import { TasksModule } from './tasks/tasks.module';
 import { BullModule } from '@nestjs/bullmq';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ExpressAdapter } from '@bull-board/express';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    BullBoardModule.forRoot({
+      route: '/admin/queues',
+      adapter: ExpressAdapter,
+    }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const redisPort = configService.get<string>('REDIS_PORT') || '6379';
-        const redisHost =
-          configService.get<string>('REDIS_HOST') || 'localhost';
-        const redisUrl = `redis://${redisHost}:${redisPort}`;
+        const redisPort = configService.get<string>('REDIS_PORT');
+        const redisHost = configService.get<string>('REDIS_HOST');
+        //const redisUrl = `redis://${redisHost}:${redisPort}`;
 
         return {
           connection: {
-            url: redisUrl,
+            host: redisHost,
+            port: Number(redisPort),
           },
         };
       },

@@ -1,7 +1,10 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { AUTH_MAIL_QUEUE, AuthMailJobs } from '../constants/auth-jobs.constants';
+import {
+  AUTH_MAIL_QUEUE,
+  AuthMailJobs,
+} from '../constants/auth-jobs.constants';
 
 @Processor(AUTH_MAIL_QUEUE)
 export class AuthMailProcessor extends WorkerHost {

@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamMembersController } from './team-members.controller';
+import { TeamRolesGuard } from '../guards/team-roles.guard';
+import { TeamMembersService } from './team-members.service';
 
 describe('TeamMembersController', () => {
   let controller: TeamMembersController;
@@ -7,7 +9,16 @@ describe('TeamMembersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TeamMembersController],
-    }).compile();
+      providers: [
+        {
+          provide: TeamMembersService,
+          useValue: {},
+        },
+      ],
+    })
+      .overrideGuard(TeamRolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<TeamMembersController>(TeamMembersController);
   });
